@@ -1,0 +1,424 @@
+.upload {
+  background-color: #ffffff;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  width: 100vw;
+}
+
+.upload .div {
+  background-color: #ffffff;
+  overflow: hidden;
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+}
+
+.upload .overlap {
+  position: absolute;
+  width: 1940px;
+  height: 136px;
+  top: 0;
+  left: -20px;
+}
+
+.upload .rectangle {
+  position: absolute;
+  width: 1920px;
+  height: 136px;
+  top: 0;
+  left: 20px;
+  background-color: #0af62d;
+}
+
+.upload .polygon {
+  position: absolute;
+  width: 99px;
+  height: 86px;
+  top: 46px;
+  left: 1301px;
+}
+
+.upload .rectangle-2 {
+  position: absolute;
+  width: 1301px;
+  height: 66px;
+  top: 61px;
+  left: 0;
+  background-color: #0000006b;
+}
+
+.upload .rectangle-3 {
+  position: absolute;
+  width: 1349px;
+  height: 81px;
+  top: 21px;
+  left: 0;
+  background-color: #c402ae;
+}
+
+.upload .group {
+  position: absolute;
+  width: 77px;
+  height: 63px;
+  top: 32px;
+  left: 339px;
+}
+
+.upload .overlap-group {
+  position: relative;
+  width: 67px;
+  height: 63px;
+  left: 5px;
+}
+
+.upload .rectangle-4 {
+  position: absolute;
+  width: 17px;
+  height: 34px;
+  top: 29px;
+  left: 6px;
+  background-color: #d9d9d9;
+}
+
+.upload .rectangle-5 {
+  position: absolute;
+  width: 17px;
+  height: 34px;
+  top: 29px;
+  left: 44px;
+  background-color: #d9d9d9;
+}
+
+.upload .rectangle-6 {
+  position: absolute;
+  width: 38px;
+  height: 10px;
+  top: 29px;
+  left: 6px;
+  background-color: #d9d9d9;
+}
+
+.upload .img {
+  position: absolute;
+  width: 67px;
+  height: 32px;
+  top: 0;
+  left: 0;
+}
+
+.upload .arrow {
+  width: 63px;
+  left: 52px;
+  position: absolute;
+  height: 52px;
+  top: 44px;
+}
+
+.upload .arrow-2 {
+  width: 59px;
+  left: 155px;
+  position: absolute;
+  height: 52px;
+  top: 44px;
+}
+
+.upload .overlap-wrapper {
+  position: absolute;
+  width: 62px;
+  height: 62px;
+  top: 36px;
+  left: 246px;
+  background-color: #d9d9d94a;
+  border-radius: 31px;
+  border: 7px solid;
+  border-color: #d9d9d9;
+}
+
+.upload .overlap-2 {
+  position: relative;
+  width: 38px;
+  height: 31px;
+  left: 31px;
+}
+
+.upload .line {
+  position: absolute;
+  width: 26px;
+  height: 12px;
+  top: 18px;
+  left: 0;
+}
+
+.upload .line-2 {
+  position: absolute;
+  width: 13px;
+  height: 31px;
+  top: 0;
+  left: 25px;
+}
+
+.upload .polygon-2 {
+  position: absolute;
+  width: 99px;
+  height: 86px;
+  top: 19px;
+  left: 1349px;
+}
+
+.upload .ellipse {
+  width: 90px;
+  height: 90px;
+  top: 19px;
+  left: 1800px;
+  border-radius: 45px;
+  position: absolute;
+  background-color: #d9d9d9;
+}
+
+.upload .image {
+  position: absolute;
+  width: 90px;
+  height: 87px;
+  top: 0;
+  left: 20px;
+}
+
+.upload .overlap-group-wrapper {
+  position: absolute;
+  width: 86px;
+  height: 66px;
+  top: 33px;
+  left: 1689px;
+}
+
+.upload .overlap-3 {
+  position: relative;
+  width: 74px;
+  height: 66px;
+  left: 6px;
+}
+
+.upload .ellipse-2 {
+  width: 48px;
+  height: 44px;
+  top: 0;
+  left: 13px;
+  border-radius: 24px / 22px;
+  position: absolute;
+  background-color: #d9d9d9;
+}
+
+.upload .polygon-3 {
+  position: absolute;
+  width: 74px;
+  height: 40px;
+  top: 9px;
+  left: 0;
+}
+
+.upload .ellipse-3 {
+  width: 23px;
+  height: 22px;
+  top: 44px;
+  left: 25px;
+  border-radius: 11.5px / 11px;
+  position: absolute;
+  background-color: #d9d9d9;
+}
+
+.upload .group-2 {
+  position: absolute;
+  width: 59px;
+  height: 62px;
+  top: 34px;
+  left: 1603px;
+}
+
+.upload .div-wrapper {
+  position: absolute;
+  width: 62px;
+  height: 60px;
+  top: 38px;
+  left: 1504px;
+  border: 5px solid;
+  border-color: #d9d9d9;
+}
+
+.upload .overlap-4 {
+  position: relative;
+  width: 38px;
+  height: 36px;
+  top: 12px;
+  left: 12px;
+}
+
+.upload .line-3 {
+  position: absolute;
+  width: 5px;
+  height: 36px;
+  top: 0;
+  left: 16px;
+}
+
+.upload .line-4 {
+  position: absolute;
+  width: 38px;
+  height: 5px;
+  top: 16px;
+  left: 0;
+}
+
+.upload .overlap-5 {
+  position: absolute;
+  width: 775px;
+  height: 517px;
+  top: 206px;
+  left: 91px;
+  border: 20px solid;
+  border-color: #d9d9d9;
+}
+
+.upload .select-JPEG-GIF-PNG {
+  position: absolute;
+  top: 313px;
+  left: 40px;
+  font-family: "Alkatra", Helvetica;
+  font-weight: 400;
+  color: #bababa;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.upload .group-3 {
+  position: absolute;
+  width: 182px;
+  height: 181px;
+  top: 68px;
+  left: 277px;
+}
+
+.upload .overlap-6 {
+  position: relative;
+  height: 181px;
+}
+
+.upload .line-5 {
+  position: absolute;
+  width: 20px;
+  height: 181px;
+  top: 0;
+  left: 76px;
+}
+
+.upload .line-6 {
+  position: absolute;
+  width: 182px;
+  height: 20px;
+  top: 86px;
+  left: 0;
+}
+
+.upload .overlap-7 {
+  position: absolute;
+  width: 356px;
+  height: 121px;
+  top: 926px;
+  left: 755px;
+}
+
+.upload .polygon-4 {
+  position: absolute;
+  width: 108px;
+  height: 86px;
+  top: 36px;
+  left: 196px;
+}
+
+.upload .rectangle-7 {
+  position: absolute;
+  width: 196px;
+  height: 66px;
+  top: 55px;
+  left: 0;
+  background-color: #0000006b;
+}
+
+.upload .rectangle-8 {
+  position: absolute;
+  width: 248px;
+  height: 81px;
+  top: 11px;
+  left: 0;
+  background-color: #898989;
+}
+
+.upload .polygon-5 {
+  position: absolute;
+  width: 108px;
+  height: 86px;
+  top: 9px;
+  left: 248px;
+}
+
+.upload .text-wrapper {
+  position: absolute;
+  top: 0;
+  left: 33px;
+  font-family: "Alkatra", Helvetica;
+  font-weight: 400;
+  color: #ffffff;
+  font-size: 64px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.upload .rectangle-9 {
+  position: absolute;
+  width: 937px;
+  height: 63px;
+  top: 266px;
+  left: 933px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid;
+  border-color: #000000;
+}
+
+.upload .text-wrapper-2 {
+  position: absolute;
+  top: 205px;
+  left: 933px;
+  font-family: "Aladin", Helvetica;
+  font-weight: 400;
+  color: #898989;
+  font-size: 40px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.upload .rectangle-10 {
+  position: absolute;
+  width: 937px;
+  height: 323px;
+  top: 400px;
+  left: 933px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid;
+  border-color: #000000;
+}
+
+.upload .text-wrapper-3 {
+  position: absolute;
+  top: 339px;
+  left: 933px;
+  font-family: "Aladin", Helvetica;
+  font-weight: 400;
+  color: #898989;
+  font-size: 40px;
+  letter-spacing: 0;
+  line-height: normal;
+}
