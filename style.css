@@ -166,7 +166,7 @@
   left: 1349px;
 }
 
-.upload .ellipse {
+.upload .circle {
   width: 90px;
   height: 90px;
   top: 19px;
@@ -199,7 +199,7 @@
   left: 6px;
 }
 
-.upload .ellipse-2 {
+.upload .circle-2 {
   width: 48px;
   height: 44px;
   top: 0;
@@ -217,7 +217,7 @@
   left: 0;
 }
 
-.upload .ellipse-3 {
+.upload .circle-3 {
   width: 23px;
   height: 22px;
   top: 44px;
@@ -256,16 +256,16 @@
 .upload .line-3 {
   position: absolute;
   width: 5px;
-  height: 36px;
+  height: 28px;
   top: 0;
-  left: 16px;
+  left: 12px;
 }
 
 .upload .line-4 {
   position: absolute;
-  width: 38px;
+  width: 31px;
   height: 5px;
-  top: 16px;
+  top: 11px;
   left: 0;
 }
 
