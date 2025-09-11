@@ -1,5 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/db");
+
+const pageRoutes = require("./routes/pageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 
@@ -10,13 +12,19 @@ const swaggerSpec = require("./config/swagger");
 
 const app = express();
 
+app.set("view engine", "ejs");
+app.set("views", "./views");
+
 app.use(cors());
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware
 app.use(express.json());
 
 // Routes
+app.use("/", pageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
