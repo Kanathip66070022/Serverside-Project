@@ -14,6 +14,10 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+exports.showRegister = async (req, res) => {
+  res.render("register");
+};
+
 // Login
 exports.loginUser = async (req, res) => {
   try {
@@ -29,6 +33,10 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+};
+
+exports.showLogin = async (req, res) => {
+  res.render("login");
 };
 
 // Get All Users
