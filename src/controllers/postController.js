@@ -3,10 +3,10 @@ const Post = require("../models/postModel");
 // ✅ Create Post
 exports.createPost = async (req, res) => {
   try {
-    const { userId, title, content, status, tags } = req.body;
+    const { username, title, content, status, tags } = req.body;
 
     const post = await Post.create({
-      userId,
+      username,
       title,
       content,
       status,
@@ -22,7 +22,7 @@ exports.createPost = async (req, res) => {
 // ✅ Get All Posts
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate("userId", "username email");
+    const posts = await Post.find().populate("username", "email");
     res.json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -32,7 +32,7 @@ exports.getPosts = async (req, res) => {
 // ✅ Get Post by postId
 exports.getPostByPostId = async (req, res) => {
   try {
-    const post = await Post.findOne({ postId: req.params.postId }).populate("userId", "username email");
+    const post = await Post.findOne({ postId: req.params.postId }).populate("username", "email");
     if (!post) return res.status(404).json({ error: "Post not found" });
     res.json(post);
   } catch (err) {

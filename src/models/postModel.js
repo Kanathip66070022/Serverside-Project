@@ -3,8 +3,8 @@ const Counter = require("./counterModel");
 
 const postSchema = new mongoose.Schema({
   postId: { type: Number, unique: true }, // auto increment PK
-  //userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // FK
-  userId: { type: String, required: true },
+  username: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // FK
+  //userId: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, default: "" },
   likes: { type: Number, default: 0 },
