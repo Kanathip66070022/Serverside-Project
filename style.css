@@ -1,4 +1,4 @@
-.upload {
+.laybox {
   background-color: #ffffff;
   display: grid;
   justify-items: center;
@@ -6,7 +6,7 @@
   width: auto;
 }
 
-.upload .div {
+.laybox .div {
   background-color: #ffffff;
   overflow: hidden;
   width: 100%;
@@ -14,7 +14,7 @@
   position: relative;
 }
 
-.upload .overlap {
+.laybox .overlap {
   position: absolute;
   width: 100%;
   height: 136px;
@@ -22,7 +22,7 @@
   left: -20px;
 }
 
-.upload .rectangle {
+.laybox .rectangle {
   position: absolute;
   width: 100%;
   height: 136px;
@@ -31,7 +31,7 @@
   background-color: #0af62d;
 }
 
-.upload .polygon {
+.laybox .polygon {
   position: absolute;
   width: 99px;
   height: 86px;
@@ -39,7 +39,7 @@
   left: 1301px;
 }
 
-.upload .rectangle-2 {
+.laybox .rectangle-2 {
   position: absolute;
   width: 68.1%;
   height: 66px;
@@ -48,7 +48,7 @@
   background-color: #0000006b;
 }
 
-.upload .rectangle-3 {
+.laybox .rectangle-3 {
   position: absolute;
   width: 70.5%;
   height: 81px;
@@ -57,7 +57,7 @@
   background-color: #c402ae;
 }
 
-.upload .group {
+.laybox .group {
   position: absolute;
   width: 77px;
   height: 63px;
@@ -65,14 +65,14 @@
   left: 339px;
 }
 
-.upload .overlap-group {
+.laybox .overlap-group {
   position: relative;
   width: 67px;
   height: 63px;
   left: 5px;
 }
 
-.upload .rectangle-4 {
+.laybox .rectangle-4 {
   position: absolute;
   width: 17px;
   height: 34px;
@@ -81,7 +81,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .rectangle-5 {
+.laybox .rectangle-5 {
   position: absolute;
   width: 17px;
   height: 34px;
@@ -90,7 +90,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .rectangle-6 {
+.laybox .rectangle-6 {
   position: absolute;
   width: 38px;
   height: 10px;
@@ -99,7 +99,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .img {
+.laybox .img {
   position: absolute;
   width: 67px;
   height: 35px;
@@ -107,7 +107,7 @@
   left: 10;
 }
 
-.upload .arrow {
+.laybox .arrow {
   width: 63px;
   left: 52px;
   position: absolute;
@@ -115,7 +115,7 @@
   top: 36px;
 }
 
-.upload .arrow-2 {
+.laybox .arrow-2 {
   width: 59px;
   left: 155px;
   position: absolute;
@@ -123,7 +123,7 @@
   top: 36px;
 }
 
-.upload .overlap-wrapper {
+.laybox .overlap-wrapper {
   position: absolute;
   width: 62px;
   height: 62px;
@@ -135,14 +135,14 @@
   border-color: #d9d9d9;
 }
 
-.upload .overlap-2 {
+.laybox .overlap-2 {
   position: relative;
   width: 38px;
   height: 31px;
   left: 31px;
 }
 
-.upload .line {
+.laybox .line {
   position: absolute;
   width: 26px;
   height: 12px;
@@ -150,7 +150,7 @@
   left: 0;
 }
 
-.upload .line-2 {
+.laybox .line-2 {
   position: absolute;
   width: 13px;
   height: 31px;
@@ -158,7 +158,7 @@
   left: 20px;
 }
 
-.upload .polygon-2 {
+.laybox .polygon-2 {
   position: absolute;
   width: 99px;
   height: 86px;
@@ -166,7 +166,7 @@
   left: 1349px;
 }
 
-.upload .circle {
+.laybox .circle {
   width: 90px;
   height: 90px;
   top: 19px;
@@ -176,7 +176,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .image {
+.laybox .image {
   position: absolute;
   width: 90px;
   height: 87px;
@@ -184,7 +184,7 @@
   left: 20px;
 }
 
-.upload .overlap-group-wrapper {
+.laybox .overlap-group-wrapper {
   position: absolute;
   width: 86px;
   height: 66px;
@@ -192,14 +192,14 @@
   left: 1689px;
 }
 
-.upload .overlap-3 {
+.laybox .overlap-3 {
   position: relative;
   width: 74px;
   height: 66px;
   left: 6px;
 }
 
-.upload .circle-2 {
+.laybox .circle-2 {
   width: 48px;
   height: 44px;
   top: 0;
@@ -209,7 +209,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .polygon-3 {
+.laybox .polygon-3 {
   position: absolute;
   width: 74px;
   height: 40px;
@@ -217,7 +217,7 @@
   left: 0;
 }
 
-.upload .circle-3 {
+.laybox .circle-3 {
   width: 23px;
   height: 22px;
   top: 44px;
@@ -227,7 +227,7 @@
   background-color: #d9d9d9;
 }
 
-.upload .group-2 {
+.laybox .group-2 {
   position: absolute;
   width: 59px;
   height: 62px;
@@ -235,7 +235,7 @@
   left: 1603px;
 }
 
-.upload .div-wrapper {
+.laybox .div-wrapper {
   position: absolute;
   width: 62px;
   height: 60px;
@@ -245,7 +245,7 @@
   border-color: #d9d9d9;
 }
 
-.upload .overlap-4 {
+.laybox .overlap-4 {
   position: relative;
   width: 38px;
   height: 36px;
@@ -253,7 +253,7 @@
   left: 12px;
 }
 
-.upload .line-3 {
+.laybox .line-3 {
   position: absolute;
   width: 5px;
   height: 28px;
@@ -261,7 +261,7 @@
   left: 12px;
 }
 
-.upload .line-4 {
+.laybox .line-4 {
   position: absolute;
   width: 31px;
   height: 5px;
@@ -269,7 +269,7 @@
   left: 0;
 }
 
-.upload .overlap-5 {
+.laybox .overlap-5 {
   position: absolute;
   width: 775px;
   height: 517px;
@@ -279,7 +279,7 @@
   border-color: #d9d9d9;
 }
 
-.upload .select-JPEG-GIF-PNG {
+.laybox .select-JPEG-GIF-PNG {
   position: absolute;
   top: 313px;
   left: 40px;
@@ -292,7 +292,7 @@
   line-height: normal;
 }
 
-.upload .group-3 {
+.laybox .group-3 {
   position: absolute;
   width: 182px;
   height: 181px;
@@ -300,12 +300,12 @@
   left: 277px;
 }
 
-.upload .overlap-6 {
+.laybox .overlap-6 {
   position: relative;
   height: 181px;
 }
 
-.upload .line-5 {
+.laybox .line-5 {
   position: absolute;
   width: 20px;
   height: 181px;
@@ -313,7 +313,7 @@
   left: 80px;
 }
 
-.upload .line-6 {
+.laybox .line-6 {
   position: absolute;
   width: 182px;
   height: 20px;
@@ -321,7 +321,7 @@
   left: 0;
 }
 
-.upload .overlap-7 {
+.laybox .overlap-7 {
   position: absolute;
   width: 356px;
   height: 121px;
@@ -329,7 +329,7 @@
   left: 755px;
 }
 
-.upload .polygon-4 {
+.laybox .polygon-4 {
   position: absolute;
   width: 108px;
   height: 86px;
@@ -337,7 +337,7 @@
   left: 196px;
 }
 
-.upload .rectangle-7 {
+.laybox .rectangle-7 {
   position: absolute;
   width: 201px;
   height: 66px;
@@ -346,7 +346,7 @@
   background-color: #0000006b;
 }
 
-.upload .rectangle-8 {
+.laybox .rectangle-8 {
   position: absolute;
   width: 270px;
   height: 81px;
@@ -355,7 +355,7 @@
   background-color: #898989;
 }
 
-.upload .polygon-5 {
+.laybox .polygon-5 {
   position: absolute;
   width: 108px;
   height: 86px;
@@ -363,7 +363,7 @@
   left: 248px;
 }
 
-.upload .text-wrapper {
+.laybox .text-wrapper {
   position: absolute;
   top: 0;
   left: 33px;
@@ -375,7 +375,7 @@
   line-height: normal;
 }
 
-.upload .rectangle-9 {
+.laybox .rectangle-9 {
   position: absolute;
   width: 937px;
   height: 63px;
@@ -387,7 +387,7 @@
   border-color: #000000;
 }
 
-.upload .text-wrapper-2 {
+.laybox .text-wrapper-2 {
   position: absolute;
   top: 205px;
   left: 933px;
@@ -399,7 +399,7 @@
   line-height: normal;
 }
 
-.upload .rectangle-10 {
+.laybox .rectangle-10 {
   position: absolute;
   width: 937px;
   height: 323px;
@@ -411,7 +411,7 @@
   border-color: #000000;
 }
 
-.upload .text-wrapper-3 {
+.laybox .text-wrapper-3 {
   position: absolute;
   top: 339px;
   left: 933px;
