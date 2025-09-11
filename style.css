@@ -102,9 +102,9 @@
 .upload .img {
   position: absolute;
   width: 67px;
-  height: 32px;
-  top: 0;
-  left: 0;
+  height: 35px;
+  top: 5;
+  left: 10;
 }
 
 .upload .arrow {
@@ -112,7 +112,7 @@
   left: 52px;
   position: absolute;
   height: 52px;
-  top: 44px;
+  top: 36px;
 }
 
 .upload .arrow-2 {
@@ -120,14 +120,14 @@
   left: 155px;
   position: absolute;
   height: 52px;
-  top: 44px;
+  top: 36px;
 }
 
 .upload .overlap-wrapper {
   position: absolute;
   width: 62px;
   height: 62px;
-  top: 36px;
+  top: 32px;
   left: 246px;
   background-color: #d9d9d94a;
   border-radius: 31px;
@@ -155,7 +155,7 @@
   width: 13px;
   height: 31px;
   top: 0;
-  left: 25px;
+  left: 20px;
 }
 
 .upload .polygon-2 {
@@ -422,4 +422,3 @@
   letter-spacing: 0;
   line-height: normal;
 }
-
