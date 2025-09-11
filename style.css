@@ -3,7 +3,7 @@
   display: grid;
   justify-items: center;
   align-items: start;
-  width: 100vw;
+  width: auto;
 }
 
 .upload .div {
@@ -41,7 +41,7 @@
 
 .upload .rectangle-2 {
   position: absolute;
-  width: 1301px;
+  width: 68.1%;
   height: 66px;
   top: 61px;
   left: 0;
@@ -50,7 +50,7 @@
 
 .upload .rectangle-3 {
   position: absolute;
-  width: 1349px;
+  width: 70.5%;
   height: 81px;
   top: 21px;
   left: 0;
