@@ -15,7 +15,7 @@
  *         postId:
  *           type: integer
  *           description: Auto-incremented ID of the post
- *         userId:
+ *         username:
  *           type: string
  *           description: Reference ID of the user who created the post
  *         title:
@@ -69,7 +69,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               userId:
+ *               username:
  *                 type: string
  *               title:
  *                 type: string
