@@ -19,6 +19,18 @@ exports.createPost = async (req, res) => {
   }
 };
 
+exports.showUpload = async (req, res) => {
+  res.render("upload");
+};
+
+exports.showCreateAlbum = async (req, res) => {
+  res.render("createAlbum");
+};
+
+exports.home = async (req, res) => {
+  res.render("home");
+};
+
 // ✅ Get All Posts
 exports.getPosts = async (req, res) => {
   try {
