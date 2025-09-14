@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= photo.title %> - Photo Detail</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .photo-wrapper {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .photo-wrapper img {
+      max-width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      margin: 10px 0;
+      color: #333;
+      text-align: center;
+    }
+
+    .meta {
+      margin: 15px 0;
+      padding: 12px;
+      background: #f1f2f6;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #555;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .public {
+      background: #2ecc71;
+      color: white;
+    }
+    .private {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      background: #3498db;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .back-btn:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- รูปภาพใหญ่ -->
+    <div class="photo-wrapper">
+      <img src="/uploads/<%= photo.filename %>" alt="<%= photo.title %>">
+    </div>
+
+    <!-- ข้อมูลรูป -->
+    <h2><%= photo.title %></h2>
+    <div class="meta">
+      <p><strong>รายละเอียด:</strong> <%= photo.content || "ไม่มีรายละเอียด" %></p>
+      <p>
+        <strong>สถานะ:</strong>
+        <% if (photo.status === "private") { %>
+          <span class="status private">Private</span>
+        <% } else { %>
+          <span class="status public">Public</span>
+        <% } %>
+      </p>
+    </div>
+
+    <!-- ปุ่มกลับ -->
+    <a href="/gallery" class="back-btn">← Back to Gallery</a>
+  </div>
+</body>
+</html>

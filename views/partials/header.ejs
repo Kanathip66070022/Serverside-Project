@@ -1,0 +1,77 @@
+<header class="navbar">
+  <div class="logo">
+    <a href="/">📷 CloudPostIt</a>
+  </div>
+
+  <form class="search-bar" action="/search" method="get">
+    <input type="text" name="q" placeholder="Search albums" required>
+    <button type="submit">🔍</button>
+  </form>
+
+  <nav class="nav-links">
+    <a href="/upload">⬆ Upload Image</a>
+    <a href="/album/create">📂 Create Album</a>
+    <a href="/profile">👤 Profile</a>
+  </nav>
+</header>
+
+<style>
+  .navbar {
+    background: #3498db;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* border-radius: 0 0 12px 12px; */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  }
+
+  .logo a {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+  }
+
+  .search-bar {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 8px 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .search-bar button {
+    background: #2980b9;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .search-bar button:hover {
+    background: #1c6691;
+  }
+
+  .nav-links a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: opacity 0.3s;
+  }
+
+  .nav-links a:hover {
+    opacity: 0.8;
+  }
+</style>

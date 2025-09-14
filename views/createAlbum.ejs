@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Album</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    select, 
+    input[type="text"], 
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: border-color 0.2s;
+      font-size: 14px;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #3498db;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Toggle switch style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #3498db;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .status-label {
+      font-weight: bold;
+      color: #444;
+    }
+
+    .status-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: #2980b9;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create Album</h1>
+    
+    <form action="/album" method="POST">
+      <!-- Select image -->
+      <div class="form-group">
+        <label for="image">Choose Image:</label>
+        <select id="image" name="image" required>
+          <% images.forEach(img => { %>
+            <option value="<%= img.filename %>"><%= img.filename %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" placeholder="Enter title" required>
+      </div>
+
+      <!-- Content -->
+      <div class="form-group">
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" placeholder="Enter content"></textarea>
+      </div>
+
+      <!-- Status Toggle -->
+      <div class="form-group">
+        <span class="status-label">Status:</span>
+        <div class="status-wrapper">
+          <label class="switch">
+            <input type="checkbox" id="status" name="status" value="public">
+            <span class="slider"></span>
+          </label>
+          <span id="statusText">Public</span>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="form-group">
+        <button type="submit" class="submit-btn">Save Album</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const statusCheckbox = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+
+    // default = public
+    statusCheckbox.checked = false;
+    statusCheckbox.value = "public";
+
+    statusCheckbox.addEventListener("change", () => {
+      if (statusCheckbox.checked) {
+        statusCheckbox.value = "private";
+        statusText.textContent = "Private";
+      } else {
+        statusCheckbox.value = "public";
+        statusText.textContent = "Public";
+      }
+    });
+  </script>
+</body>
+</html>
