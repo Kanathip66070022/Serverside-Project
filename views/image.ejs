@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title><%= photo.title %> - Photo Detail</title>
+  <title>
+    <%= photo.title %> - Photo Detail
+  </title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,7 +20,7 @@
       background: #fff;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     .photo-wrapper {
@@ -30,7 +33,7 @@
       max-height: 500px;
       object-fit: contain;
       border-radius: 12px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
     }
 
     h2 {
@@ -55,10 +58,12 @@
       font-size: 14px;
       font-weight: bold;
     }
+
     .public {
       background: #2ecc71;
       color: white;
     }
+
     .private {
       background: #e74c3c;
       color: white;
@@ -74,11 +79,13 @@
       border-radius: 8px;
       transition: background 0.3s;
     }
+
     .back-btn:hover {
       background: #2980b9;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <!-- รูปภาพใหญ่ -->
@@ -87,16 +94,20 @@
     </div>
 
     <!-- ข้อมูลรูป -->
-    <h2><%= photo.title %></h2>
+    <h2>
+      <%= photo.title %>
+    </h2>
     <div class="meta">
-      <p><strong>รายละเอียด:</strong> <%= photo.content || "ไม่มีรายละเอียด" %></p>
+      <p><strong>รายละเอียด:</strong>
+        <%= photo.content || "ไม่มีรายละเอียด" %>
+      </p>
       <p>
         <strong>สถานะ:</strong>
-        <% if (photo.status === "private") { %>
+        <% if (photo.status==="private" ) { %>
           <span class="status private">Private</span>
-        <% } else { %>
-          <span class="status public">Public</span>
-        <% } %>
+          <% } else { %>
+            <span class="status public">Public</span>
+            <% } %>
       </p>
     </div>
 
@@ -104,4 +115,5 @@
     <a href="/gallery" class="back-btn">← Back to Gallery</a>
   </div>
 </body>
+
 </html>

@@ -1,64 +1,7 @@
-import Image from "../models/imageModel.js";
-import User from "../models/userModel.js";
-import Album from "../models/albumModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// ฟังก์ชันอัพโหลดรูป
-export const uploadImage = async (req, res) => {
-  try {
-    const { title, content } = req.body;
-    const imageUrl = "/uploads/" + req.file.filename;
-
-    // สมมติว่ามี req.user._id จากระบบ auth (เช่น JWT / session)
-    const userId = req.user?._id; // ⚠️ ต้องมี middleware ที่ set req.user
-    if (!userId) {
-      return res.status(401).send("Unauthorized: No user");
-    }
-
-    const newImage = new Image({
-      title,
-      content,
-      imageUrl,
-      user: userId
-    });
-
-    await newImage.save();
-    res.redirect("/gallery");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Upload failed");
-  }
-};
-
-// ฟังก์ชัน render หน้า upload
-export const showUpload = (req, res) => {
-  res.render("upload");
-};
-
-// ฟังก์ชันดึงรูปทั้งหมด
-export const getImages = async (req, res) => {
-  try {
-    // populate user เพื่อดึงข้อมูลเจ้าของรูป
-    const images = await Image.find()
-      .sort({ createdAt: -1 })
-      .populate("user", "username email profilePic");
-
-    res.render("gallery", { images });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to load gallery");
-  }
-};
-
-// ฟังก์ชัน render หน้า login และ register (ใช้โดย pageRoutes)
-export const showLogin = (req, res) => {
-  res.render("login");
-};
-
-export const showRegister = (req, res) => {
-  res.render("register");
-};
+import User from "../models/userModel.js";
 
 // Register new user
 export const registerUser = async (req, res) => {
@@ -142,54 +85,6 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// ฟังก์ชัน render หน้า profile
-export const showProfile = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-    }
-
-    const User = (await import("../models/userModel.js")).default;
-    const Image = (await import("../models/imageModel.js")).default;
-    const Album = (await import("../models/albumModel.js")).default;
-
-    // ดึง user ใหม่จาก DB เพื่อให้ได้ค่าล่าสุด
-    const freshUser = await User.findById(req.user._id).lean();
-
-    // gallery = รูปของ user
-    const gallery = await Image.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .select("filename originalname imageUrl title")
-      .lean();
-
-    // albums ของ user พร้อม populate images
-    let albums = await Album.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .populate({
-        path: "images",
-        select: "filename imageUrl title"
-      })
-      .lean();
-
-    // คำนวณ cover ของแต่ละอัลบั้ม (ใช้รูปแรกเป็น cover หรือ fallback)
-    albums = albums.map(a => {
-      const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
-      const cover = first ? (first.imageUrl || `/uploads/${first.filename}`) : "/images/default-cover.jpg";
-      return { ...a, cover };
-    });
-
-    // ส่งข้อมูลทั้งหมดให้ view (มั่นใจว่า albums ส่งเป็น array เสมอ)
-    return res.render("profile", {
-      user: freshUser || req.user,
-      gallery,
-      albums
-    });
-  } catch (err) {
-    console.error("showProfile error:", err);
-    return res.status(500).render("profile", { user: req.user || null, gallery: [], albums: [] });
-  }
-};
-
 // เพิ่ม handler สำหรับ POST /profile/edit
 export const updateProfile = async (req, res) => {
   try {
@@ -220,4 +115,4 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export default { uploadImage, showUpload, getImages, showLogin, showRegister, registerUser, loginUser, logoutUser, getUsers, showProfile, updateProfile };
+export default { registerUser, loginUser, logoutUser, getUsers, updateProfile };
