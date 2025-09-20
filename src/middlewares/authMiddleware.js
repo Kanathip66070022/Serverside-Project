@@ -1,28 +1,31 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
-const authMiddleware = () => {
-  return async (req, res, next) => {
-    try {
-      const jwt_secret = process.env.JWT_SECRET || "secret";
-      const authHeader = req.headers["authorization"];
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : req.cookies?.token;
 
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "No token provided" });
-      }
-
-      const token = authHeader.split(" ")[1];
-      const decodedToken = jwt.verify(token, jwt_secret);
-
-      const user = await User.findById(decodedToken.id);
-      if (!user) return res.status(401).json({ message: "Invalid token" });
-
-      req.user = user;
-      next();
-    } catch (err) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!token) {
+      req.user = null;
+      return next();
     }
-  };
+
+    const payload = jwt.verify(token, process.env.JWT_SECRET || "secret");
+    const user = await User.findById(payload.id).select("-password");
+    if (!user) {
+      req.user = null;
+      return next();
+    }
+
+    req.user = user;
+    res.locals.user = user; // ให้ views เข้าถึง user ได้โดยตรง
+    next();
+  } catch (err) {
+    console.error("authMiddleware:", err.message);
+    req.user = null;
+    return next();
+  }
 };
 
 export default authMiddleware;

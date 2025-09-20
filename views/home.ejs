@@ -6,6 +6,11 @@
     <title>Home - Public Albums</title>
     <style>
         body {
+            margin: 0;
+            background: #f5f6fa;
+        }
+
+        .body {
             font-family: Arial, sans-serif;
             background: #f5f6fa;
             margin: 0;
@@ -87,32 +92,40 @@
 </head>
 
 <body>
+
     <%- include('partials/header') %>
 
-        <h1>🌍 Public Albums</h1>
+        <div class="body">
 
-        <div class="album-list">
-            <% albums.forEach(album=> { %>
-                <div class="album-card">
-                    <div class="album-cover">
-                        <a href="/album/<%= album.id %>">
-                            <img src="/uploads/<%= album.cover %>" alt="<%= album.title %>">
-                        </a>
-                    </div>
-                    <div class="album-info">
-                        <h3>
-                            <%= album.title %>
-                        </h3>
-                        <p>
-                            <%= album.content || "ไม่มีรายละเอียด" %>
-                        </p>
-                        <div class="album-footer">
-                            <span>👤 <%= album.owner %></span>
-                            <a href="/album/<%= album.id %>">ดูอัลบั้ม →</a>
+            <h1>🌍 Public Albums</h1>
+
+            <div class="album-list">
+                <% albums.forEach(album=> { %>
+                    <div class="album-card">
+                        <div class="album-cover">
+                            <a href="/album/<%= album._id || album.id %>">
+                                <img
+                                  src="<%= album.cover
+                                        || (album.images && album.images[0] && (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename)))
+                                        || '/images/default-cover.jpg' %>"
+                                  alt="<%= album.title %>">
+                            </a>
+                        </div>
+                        <div class="album-info">
+                            <h3>
+                                <%= album.title %>
+                            </h3>
+                            <p>
+                                <%= album.content || "ไม่มีรายละเอียด" %>
+                            </p>
+                            <div class="album-footer">
+                                <span>👤 <%= album.owner %></span>
+                                <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <% }) %>
+                    <% }) %>
+            </div>
         </div>
 </body>
 

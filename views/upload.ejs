@@ -160,7 +160,6 @@
     <%- include("partials/header") %>
 
         <div class="body">
-
             <div class="container">
                 <h1>Upload Image</h1>
 
@@ -187,9 +186,23 @@
                     <div class="form-group">
                         <button type="submit" class="submit-btn">Upload</button>
                     </div>
+
+                    <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error" style="color:#e74c3c;"><%= error %></p>
+  <% } %>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <p class="success" style="color:#2ecc71;"><%= success %></p>
+    <% if (file && file.imageUrl) { %>
+      <div style="margin-top:10px;">
+        <img src="<%= file.imageUrl %>" alt="<%= file.originalname %>" style="max-width:100%; border-radius:8px;"/>
+      </div>
+    <% } %>
+  <% } %>
                 </form>
             </div>
         </div>
 </body>
+
 
 </html>
