@@ -187,18 +187,23 @@
                         <button type="submit" class="submit-btn">Upload</button>
                     </div>
 
-                    <% if (typeof error !== 'undefined' && error) { %>
-    <p class="error" style="color:#e74c3c;"><%= error %></p>
-  <% } %>
+                    <% if (typeof error !=='undefined' && error) { %>
+                        <p class="error" style="color:#e74c3c;">
+                            <%= error %>
+                        </p>
+                        <% } %>
 
-  <% if (typeof success !== 'undefined' && success) { %>
-    <p class="success" style="color:#2ecc71;"><%= success %></p>
-    <% if (file && file.imageUrl) { %>
-      <div style="margin-top:10px;">
-        <img src="<%= file.imageUrl %>" alt="<%= file.originalname %>" style="max-width:100%; border-radius:8px;"/>
-      </div>
-    <% } %>
-  <% } %>
+                            <% if (typeof success !=='undefined' && success) { %>
+                                <p class="success" style="color:#2ecc71;">
+                                    <%= success %>
+                                </p>
+                                <% if (file && file.imageUrl) { %>
+                                    <div style="margin-top:10px;">
+                                        <img src="<%= file.imageUrl %>" alt="<%= file.originalname %>"
+                                            style="max-width:100%; border-radius:8px;" />
+                                    </div>
+                                    <% } %>
+                                        <% } %>
                 </form>
             </div>
         </div>

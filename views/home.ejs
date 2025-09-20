@@ -104,11 +104,9 @@
                     <div class="album-card">
                         <div class="album-cover">
                             <a href="/album/<%= album._id || album.id %>">
-                                <img
-                                  src="<%= album.cover
+                                <img src="<%= album.cover
                                         || (album.images && album.images[0] && (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename)))
-                                        || '/images/default-cover.jpg' %>"
-                                  alt="<%= album.title %>">
+                                        || '/images/default-cover.jpg' %>" alt="<%= album.title %>">
                             </a>
                         </div>
                         <div class="album-info">

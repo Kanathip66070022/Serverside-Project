@@ -193,32 +193,28 @@
         <!-- Gallery -->
         <h3>Gallery</h3>
         <div class="grid">
-          <% if (Array.isArray(gallery) && gallery.length > 0) { %>
-            <% gallery.forEach(img => { %>
+          <% if (Array.isArray(gallery) && gallery.length> 0) { %>
+            <% gallery.forEach(img=> { %>
               <div class="album-card">
-                <img
-                  src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
-                  alt="<%= img.title || img.originalname || img.filename || 'image' %>"
-                  loading="lazy"
-                />
+                <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+                  alt="<%= img.title || img.originalname || img.filename || 'image' %>" loading="lazy" />
                 <p>
                   <%= img.title || img.originalname || img.filename || 'image' %>
                 </p>
               </div>
-            <% }) %>
-          <% } else { %>
-            <p>No images uploaded yet.</p>
-          <% } %>
+              <% }) %>
+                <% } else { %>
+                  <p>No images uploaded yet.</p>
+                  <% } %>
         </div>
 
         <!-- Albums -->
         <h3>Albums</h3>
         <div class="grid">
-          <% if (albums.length > 0) { %>
-            <% albums.forEach(album => { %>
+          <% if (albums.length> 0) { %>
+            <% albums.forEach(album=> { %>
               <a class="album-card" href="/album/<%= album._id %>">
-                <img
-                  src="<%= (
+                <img src="<%= (
                     album.cover && typeof album.cover === 'string' && album.cover.startsWith('/')
                       ? album.cover
                       : (album.cover ? ('/uploads/' + album.cover) : (
@@ -226,14 +222,15 @@
                             ? (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename))
                             : '/images/default-cover.jpg'
                         ))
-                  ) %>"
-                  alt="<%= album.title || 'Album' %>">
-                <p><%= album.title %></p>
+                  ) %>" alt="<%= album.title || 'Album' %>">
+                <p>
+                  <%= album.title %>
+                </p>
               </a>
-            <% }) %>
-          <% } else { %>
-            <p>No albums created yet.</p>
-          <% } %>
+              <% }) %>
+                <% } else { %>
+                  <p>No albums created yet.</p>
+                  <% } %>
         </div>
       </div>
 
@@ -244,12 +241,12 @@
           <form action="/profile/edit" method="POST" enctype="multipart/form-data">
             <div class="form-group">
               <label for="name">Name</label>
-              <input id="name" name="name" type="text" value="<%= (user && (user.name || user.username)) || '' %>"/>
+              <input id="name" name="name" type="text" value="<%= (user && (user.name || user.username)) || '' %>" />
             </div>
 
             <div class="form-group">
               <label for="profileImage">Profile Image</label>
-              <input id="profileImage" name="profileImage" type="file" accept="image/*"/>
+              <input id="profileImage" name="profileImage" type="file" accept="image/*" />
             </div>
 
             <div class="modal-actions">

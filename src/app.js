@@ -2,14 +2,15 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./config/swagger.js";
 import path from "path";
+
+import swaggerSpec from "./config/swagger.js";
 
 import pageRoutes from "./routes/pageRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-import postRoutes from "./routes/postRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import authMiddleware from "./middlewares/authMiddleware.js";
+import albumRoutes from "./routes/albumRoutes.js";
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use((req, res, next) => {
 app.use("/", pageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/api/posts", postRoutes);
+app.use("/api/albums", albumRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
