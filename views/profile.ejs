@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Profile</title>
   <style>
     body {
+      margin: 0;
+      background: #f5f6fa;
+    }
+
+    .body {
       font-family: Arial, sans-serif;
       background: #f5f6fa;
       margin: 0;
@@ -24,7 +30,7 @@
       background: #fff;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     .profile-header img {
@@ -50,6 +56,7 @@
       cursor: pointer;
       transition: background 0.3s;
     }
+
     .edit-btn:hover {
       background: #2980b9;
     }
@@ -72,7 +79,7 @@
       border-radius: 10px;
       object-fit: cover;
       height: 150px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
 
     .album-card {
@@ -80,7 +87,7 @@
       border-radius: 10px;
       padding: 10px;
       text-align: center;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
 
     .album-card img {
@@ -96,12 +103,15 @@
       display: none;
       position: fixed;
       z-index: 1000;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
       justify-content: center;
       align-items: center;
     }
+
     .modal-content {
       background: #fff;
       padding: 20px;
@@ -109,12 +119,15 @@
       width: 100%;
       max-width: 400px;
     }
+
     .modal-content h3 {
       margin-top: 0;
     }
+
     .modal-content .form-group {
       margin-bottom: 15px;
     }
+
     .modal-content input[type="text"],
     .modal-content input[type="file"] {
       width: 100%;
@@ -122,10 +135,12 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
+
     .modal-content .modal-actions {
       text-align: right;
       margin-top: 15px;
     }
+
     .save-btn {
       background: #27ae60;
       color: white;
@@ -134,6 +149,7 @@
       border-radius: 8px;
       cursor: pointer;
     }
+
     .cancel-btn {
       background: #e74c3c;
       color: white;
@@ -149,91 +165,122 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
       .profile-header img {
         margin-bottom: 10px;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="profile-container">
-    <!-- Profile Header -->
-    <div class="profile-header">
-      <img src="<%= user.profileImage || '/default-profile.png' %>" alt="Profile Picture">
-      <div class="profile-info">
-        <h2><%= user.name %></h2>
-        <button class="edit-btn" id="editBtn">Edit Profile</button>
+
+  <%- include('partials/header') %>
+
+    <div class="body">
+      <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <img src="<%= user.profileImage || '/default-profile.png' %>" alt="Profile Picture">
+          <div class="profile-info">
+            <h1>
+              <%= (user && (user.name || user.username || user.email)) || 'Unnamed' %>
+            </h1>
+            <button class="edit-btn" id="editBtn">Edit Profile</button>
+          </div>
+        </div>
+
+        <!-- Gallery -->
+        <h3>Gallery</h3>
+        <div class="grid">
+          <% if (Array.isArray(gallery) && gallery.length > 0) { %>
+            <% gallery.forEach(img => { %>
+              <div class="album-card">
+                <img
+                  src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+                  alt="<%= img.title || img.originalname || img.filename || 'image' %>"
+                  loading="lazy"
+                />
+                <p>
+                  <%= img.title || img.originalname || img.filename || 'image' %>
+                </p>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>No images uploaded yet.</p>
+          <% } %>
+        </div>
+
+        <!-- Albums -->
+        <h3>Albums</h3>
+        <div class="grid">
+          <% if (albums.length > 0) { %>
+            <% albums.forEach(album => { %>
+              <a class="album-card" href="/album/<%= album._id %>">
+                <img
+                  src="<%= (
+                    album.cover && typeof album.cover === 'string' && album.cover.startsWith('/')
+                      ? album.cover
+                      : (album.cover ? ('/uploads/' + album.cover) : (
+                          album.images && album.images[0]
+                            ? (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename))
+                            : '/images/default-cover.jpg'
+                        ))
+                  ) %>"
+                  alt="<%= album.title || 'Album' %>">
+                <p><%= album.title %></p>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>No albums created yet.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Edit Profile Modal -->
+      <div class="modal" id="editModal">
+        <div class="modal-content">
+          <h3>Edit Profile</h3>
+          <form action="/profile/edit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" value="<%= (user && (user.name || user.username)) || '' %>"/>
+            </div>
+
+            <div class="form-group">
+              <label for="profileImage">Profile Image</label>
+              <input id="profileImage" name="profileImage" type="file" accept="image/*"/>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+              <button type="submit" class="save-btn">Save</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
-    <!-- Gallery -->
-    <h3>Gallery</h3>
-    <div class="grid">
-      <% if (gallery.length > 0) { %>
-        <% gallery.forEach(img => { %>
-          <img src="/uploads/<%= img.filename %>" alt="gallery">
-        <% }) %>
-      <% } else { %>
-        <p>No images uploaded yet.</p>
-      <% } %>
-    </div>
+    <script>
+      const editBtn = document.getElementById("editBtn");
+      const editModal = document.getElementById("editModal");
+      const cancelBtn = document.getElementById("cancelBtn");
 
-    <!-- Albums -->
-    <h3>Albums</h3>
-    <div class="grid">
-      <% if (albums.length > 0) { %>
-        <% albums.forEach(album => { %>
-          <div class="album-card">
-            <img src="/uploads/<%= album.cover %>" alt="album cover">
-            <p><%= album.title %></p>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <p>No albums created yet.</p>
-      <% } %>
-    </div>
-  </div>
+      editBtn.addEventListener("click", () => {
+        editModal.style.display = "flex";
+      });
 
-  <!-- Edit Profile Modal -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <h3>Edit Profile</h3>
-      <form action="/profile/edit" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="name">Name:</label>
-          <input type="text" name="name" id="name" value="<%= user.name %>">
-        </div>
-        <div class="form-group">
-          <label for="profileImage">Profile Image:</label>
-          <input type="file" name="profileImage" id="profileImage" accept="image/*">
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
-          <button type="submit" class="save-btn">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    const editBtn = document.getElementById("editBtn");
-    const editModal = document.getElementById("editModal");
-    const cancelBtn = document.getElementById("cancelBtn");
-
-    editBtn.addEventListener("click", () => {
-      editModal.style.display = "flex";
-    });
-
-    cancelBtn.addEventListener("click", () => {
-      editModal.style.display = "none";
-    });
-
-    // ปิด modal ถ้าคลิกนอกกล่อง
-    window.addEventListener("click", (e) => {
-      if (e.target === editModal) {
+      cancelBtn.addEventListener("click", () => {
         editModal.style.display = "none";
-      }
-    });
-  </script>
+      });
+
+      // ปิด modal ถ้าคลิกนอกกล่อง
+      window.addEventListener("click", (e) => {
+        if (e.target === editModal) {
+          editModal.style.display = "none";
+        }
+      });
+    </script>
 </body>
+
 </html>

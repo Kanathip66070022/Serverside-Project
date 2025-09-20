@@ -1,17 +1,32 @@
 <header class="navbar">
   <div class="logo">
-    <a href="/">📷 CloudPostIt</a>
+    <a href="/home">📷 CloudPostIt</a>
   </div>
 
-  <form class="search-bar" action="/search" method="get">
-    <input type="text" name="q" placeholder="Search albums" required>
-    <button type="submit">🔍</button>
-  </form>
+  <% if (typeof currentPath !== 'undefined' && (currentPath === '/home' || currentPath === '/search')) { %>
+    <form class="search-bar" action="/search" method="get">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search albums"
+        value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+      />
+      <button type="submit">🔍</button>
+    </form>
+  <% } %>
 
   <nav class="nav-links">
-    <a href="/upload">⬆ Upload Image</a>
-    <a href="/album/create">📂 Create Album</a>
-    <a href="/profile">👤 Profile</a>
+    <% if (typeof user !== 'undefined' && user) { %>
+      <a href="/upload">⬆ Upload Image</a>
+      <a href="/album/create">📂 Create Album</a>
+      <a href="/profile">👤 Profile</a>
+      <a href="/logout">🔓 Logout</a>
+    <% } else { %>
+      <a href="/upload">⬆ Upload Image</a>
+      <a href="/album/create">📂 Create Album</a>
+      <a href="/login">🔑 Login</a>
+      <a href="/register">✍️ Register</a>
+    <% } %>
   </nav>
 </header>
 
@@ -64,14 +79,26 @@
   }
 
   .nav-links a {
-    margin-left: 15px;
+    margin-left: 12px;
     text-decoration: none;
     color: white;
-    font-weight: bold;
-    transition: opacity 0.3s;
+    font-weight: 600;
+    transition: background 0.18s, transform 0.12s, opacity 0.18s;
+    padding: 8px 12px;
+    border-radius: 999px; /* pill */
+    background: rgba(255,255,255,0.08);
+    display: inline-flex;
+    align-items: center;
   }
 
   .nav-links a:hover {
-    opacity: 0.8;
+    background: rgba(255,255,255,0.14);
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  .nav-links a:focus {
+    outline: 2px solid rgba(255,255,255,0.18);
+    outline-offset: 2px;
   }
 </style>

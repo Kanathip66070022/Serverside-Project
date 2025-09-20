@@ -1,8 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const counterSchema = new mongoose.Schema({
-  _id: { type: String, required: true }, // ใช้เก็บชื่อ collection เช่น "postId"
-  sequenceValue: { type: Number, default: 0 },
+  _id: { type: String, required: true },
+  sequenceValue: { type: Number, default: 0 }
 });
 
-module.exports = mongoose.model("Counter", counterSchema);
+const Counter = mongoose.model("Counter", counterSchema);
+
+export default Counter;

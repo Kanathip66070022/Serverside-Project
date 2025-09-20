@@ -156,15 +156,16 @@
  *         description: Post deleted successfully
  */
 
-const express = require("express");
-const router = express.Router();
-const {
+import express from "express";
+import {
   createPost,
   getPosts,
   getPostByPostId,
   updatePostByPostId,
   deletePostByPostId
-} = require("../controllers/postController");
+} from "../controllers/postController.js";
+
+const router = express.Router();
 
 // Routes
 router.post("/", createPost);
@@ -173,4 +174,4 @@ router.get("/:postId", getPostByPostId);
 router.put("/:postId", updatePostByPostId);
 router.delete("/:postId", deletePostByPostId);
 
-module.exports = router;
+export default router;
