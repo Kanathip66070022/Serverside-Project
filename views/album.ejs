@@ -34,13 +34,6 @@
       color: #333;
     }
 
-    .meta {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 15px;
-      color: #555;
-    }
-
     .status {
       display: inline-block;
       padding: 6px 12px;
@@ -99,6 +92,33 @@
       color: #777;
     }
 
+    /* truncate title (1 line) and content (max 2 lines) */
+    .caption .album-title {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 16px;
+      margin: 5px 0;
+      font-weight: 600;
+    }
+
+    .caption .album-content {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      /* show max 2 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      color: #666;
+      font-size: 13px;
+      line-height: 1.2;
+      max-height: calc(1.2em * 2);
+      /* fallback */
+    }
+
     .back-btn {
       display: inline-block;
       margin-top: 25px;
@@ -113,6 +133,15 @@
     .back-btn:hover {
       background: #2980b9;
     }
+
+    .meta {
+      margin: 15px 0;
+      padding: 12px;
+      background: #f1f2f6;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #555;
+    }
   </style>
 </head>
 
@@ -126,10 +155,33 @@
         <h1>
           <%= album.title %>
         </h1>
+
+        <!-- รูปในอัลบั้ม -->
+        <div class="gallery">
+          <% if (Array.isArray(album.images) && album.images.length) { %>
+            <% album.images.forEach(image=> { %>
+              <div class="gallery-item">
+                <a href="/image/<%= image._id || image.id %>">
+                  <img src="<%= image.imageUrl || ('/uploads/' + image.filename) %>"
+                    alt="<%= image.title || image.originalname || 'image' %>" loading="lazy" />
+                </a>
+                <div class="caption">
+                  <h3 class="album-title"><%= image.title || 'Untitled' %></h3>
+                  <p class="album-content"><%= image.content || "ไม่มีรายละเอียด" %></p>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>No images in this album.</p>
+          <% } %>
+        </div>
+
         <div class="meta">
           <p>
+            <strong>Content:</strong>
             <%= album.content || "ไม่มีรายละเอียด" %>
           </p>
+          <p><strong>Status:</strong>
           <% if (album.status==="private" ) { %>
             <span class="status private">Private</span>
             <% } else { %>
@@ -137,28 +189,8 @@
               <% } %>
         </div>
 
-        <!-- รูปในอัลบั้ม -->
-        <div class="gallery">
-          <% album.photos.forEach(photo=> { %>
-            <div class="gallery-item">
-              <a href="/photo/<%= photo.id %>">
-                <img src="<%= photo.imageUrl || ('/uploads/' + photo.filename) %>"
-                  alt="<%= photo.title || photo.originalname || 'photo' %>" loading="lazy" />
-              </a>
-              <div class="caption">
-                <h3>
-                  <%= photo.title %>
-                </h3>
-                <p>
-                  <%= photo.content || "ไม่มีรายละเอียด" %>
-                </p>
-              </div>
-            </div>
-            <% }) %>
-        </div>
-
         <!-- ปุ่มกลับ -->
-        <div style="text-align: center;">
+        <div">
           <a href="#" class="back-btn"
             onclick="if (history.length > 1) { history.back(); } else { window.location = '/home'; } return false;">←
             Back</a>

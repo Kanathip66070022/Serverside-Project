@@ -64,10 +64,26 @@
             color: #333;
         }
 
-        .album-info p {
-            flex: 1;
-            font-size: 14px;
+        .album-info .album-title {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 0 8px;
+        }
+
+        .album-info .album-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
             color: #666;
+            font-size: 14px;
         }
 
         .album-footer {
@@ -110,14 +126,14 @@
                             </a>
                         </div>
                         <div class="album-info">
-                            <h3>
+                            <h3 class="album-title">
                                 <%= album.title %>
                             </h3>
-                            <p>
+                            <p class="album-content">
                                 <%= album.content || "ไม่มีรายละเอียด" %>
                             </p>
                             <div class="album-footer">
-                                <span>👤 <%= album.owner %></span>
+                                <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
                                 <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
                             </div>
                         </div>

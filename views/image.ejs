@@ -4,10 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <title>
-    <%= photo.title %> - Photo Detail
+    <%= image.title || 'Image' %>
   </title>
   <style>
     body {
+      margin: 0;
+      background: #f5f6fa;
+    }
+
+    .body {
       font-family: Arial, sans-serif;
       background: #f5f6fa;
       margin: 0;
@@ -87,33 +92,39 @@
 </head>
 
 <body>
-  <div class="container">
-    <!-- รูปภาพใหญ่ -->
-    <div class="photo-wrapper">
-      <img src="/uploads/<%= photo.filename %>" alt="<%= photo.title %>">
-    </div>
 
-    <!-- ข้อมูลรูป -->
-    <h2>
-      <%= photo.title %>
-    </h2>
-    <div class="meta">
-      <p><strong>รายละเอียด:</strong>
-        <%= photo.content || "ไม่มีรายละเอียด" %>
-      </p>
-      <p>
-        <strong>สถานะ:</strong>
-        <% if (photo.status==="private" ) { %>
-          <span class="status private">Private</span>
-          <% } else { %>
-            <span class="status public">Public</span>
-            <% } %>
-      </p>
-    </div>
+  <%- include('partials/header') %>
 
-    <!-- ปุ่มกลับ -->
-    <a href="/gallery" class="back-btn">← Back to Gallery</a>
-  </div>
+    <div class="body">
+      <div class="container">
+        <!-- รูปภาพใหญ่ -->
+        <div class="photo-wrapper">
+          <img src="<%= image.imageUrl || ('/uploads/' + image.filename) %>" alt="<%= image.title %>">
+        </div>
+
+        <!-- ข้อมูลรูป -->
+        <h2>
+          <%= image.title || 'Untitled' %>
+        </h2>
+        <div class="meta">
+          <p><strong>Content:</strong>
+            <%= image.content || "ไม่มีรายละเอียด" %>
+          </p>
+          <p><strong>By:</strong>
+            <%= image.user?.username || 'Unknown' %>
+          </p>
+        </div>
+
+        <!-- ปุ่มกลับ -->
+        <a href="javascript:history.back()" class="back-btn" style="margin-left: 10px;">← Back</a>
+
+        <!-- ปุ่มดาวน์โหลด -->
+        <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>" download="<%= image.title || 'download' %>"
+          class="back-btn" style="background: #27ae60; margin-left: 10px;">
+          ⬇ Download
+        </a>
+      </div>
+    </div>
 </body>
 
 </html>
