@@ -92,8 +92,8 @@
     }
 
     .album-card:hover {
-            transform: translateY(-5px);
-        }
+      transform: translateY(-5px);
+    }
 
     .album-card img {
       width: 100%;
@@ -176,7 +176,34 @@
       }
     }
 
-    .select-thumb.selected { border-color: #3498db; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+    .select-thumb.selected {
+      border-color: #3498db;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    /* gallery item title: one line ellipsis */
+    .grid .album-card p.card-title {
+      margin: 8px 0 0;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* album card title (links): max 2 lines */
+    .grid a.album-card p.card-title {
+      margin: 8px 0 0;
+      font-size: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      max-height: calc(1.2em * 2);
+    }
   </style>
 </head>
 
@@ -191,9 +218,7 @@
           <div class="profile-avatar">
             <img
               src="<%= (user && user.profilePic && (user.profilePic.imageUrl || ('/uploads/' + user.profilePic.filename))) || '/images/default-avatar.png' %>"
-              alt="avatar"
-              style="width:120px;height:120px;border-radius:8px;object-fit:cover;"
-            />
+              alt="avatar" style="width:120px;height:120px;border-radius:8px;object-fit:cover;" />
           </div>
           <div class="profile-info">
             <h1>
@@ -209,9 +234,11 @@
           <% if (Array.isArray(gallery) && gallery.length> 0) { %>
             <% gallery.forEach(img=> { %>
               <div class="album-card">
-                <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
-                  alt="<%= img.title || img.originalname || img.filename || 'image' %>" loading="lazy" />
-                <p>
+                <a href="/image/<%= img._id || img.id %>">
+                  <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+                    alt="<%= img.title || img.originalname || img.filename || 'image' %>" loading="lazy" />
+                </a>
+                <p class="card-title">
                   <%= img.title || img.originalname || img.filename || 'image' %>
                 </p>
               </div>
@@ -236,7 +263,7 @@
                             : '/images/default-cover.jpg'
                         ))
                   ) %>" alt="<%= album.title || 'Album' %>">
-                <p>
+                <p class="card-title">
                   <%= album.title %>
                 </p>
               </a>
@@ -251,7 +278,8 @@
       <div class="modal" id="editModal">
         <div class="modal-content">
           <h3>Edit Profile</h3>
-          <form id="profileForm" action="/api/users/profile" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault(); submitProfile(this);">
+          <form id="profileForm" action="/api/users/profile" method="POST" enctype="multipart/form-data"
+            onsubmit="event.preventDefault(); submitProfile(this);">
             <input type="hidden" name="_method" value="PATCH">
             <div class="form-group">
               <label for="name">Name</label>
@@ -262,15 +290,18 @@
               <label for="profileImage">Profile Image</label>
 
               <div class="select-gallery" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                <% if (Array.isArray(gallery) && gallery.length > 0) { %>
-                  <% gallery.forEach(img => { %>
-                    <div class="select-thumb" data-id="<%= img._id %>" style="width:80px;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid transparent;">
-                      <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>" alt="<%= img.title || img.originalname %>" style="width:100%;height:80px;object-fit:cover;display:block;">
+                <% if (Array.isArray(gallery) && gallery.length> 0) { %>
+                  <% gallery.forEach(img=> { %>
+                    <div class="select-thumb" data-id="<%= img._id %>"
+                      style="width:80px;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid transparent;">
+                      <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+                        alt="<%= img.title || img.originalname %>"
+                        style="width:100%;height:80px;object-fit:cover;display:block;">
                     </div>
-                  <% }) %>
-                <% } else { %>
-                  <p>No images available. Upload images first.</p>
-                <% } %>
+                    <% }) %>
+                      <% } else { %>
+                        <p>No images available. Upload images first.</p>
+                        <% } %>
               </div>
 
               <input type="hidden" name="profileImageId" id="profileImageId" value="">
@@ -305,7 +336,7 @@
         }
       });
 
-      (function(){
+      (function () {
         const thumbs = document.querySelectorAll('.select-thumb');
         const input = document.getElementById('profileImageId');
         thumbs.forEach(t => t.addEventListener('click', () => {
@@ -315,7 +346,7 @@
         }));
 
         // If user already has profileImage that matches gallery, preselect it
-        (function preselect(){
+        (function preselect() {
           const current = "<%= user?.profileImage || '' %>";
           if (!current) return;
           thumbs.forEach(t => {
@@ -330,18 +361,18 @@
       })();
 
       async function submitProfile(form) {
-  const fd = new FormData(form);
-  const res = await fetch('/api/users/profile', {
-    method: 'PATCH',
-    body: fd,
-    credentials: 'same-origin'
-  });
-  if (res.ok) window.location.reload();
-  else {
-    const data = await res.json().catch(()=>null);
-    alert(data?.error || 'Update failed');
-  }
-}
+        const fd = new FormData(form);
+        const res = await fetch('/api/users/profile', {
+          method: 'PATCH',
+          body: fd,
+          credentials: 'same-origin'
+        });
+        if (res.ok) window.location.reload();
+        else {
+          const data = await res.json().catch(() => null);
+          alert(data?.error || 'Update failed');
+        }
+      }
     </script>
 </body>
 

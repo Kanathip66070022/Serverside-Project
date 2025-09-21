@@ -1,3 +1,5 @@
+import Image from "../models/imageModel.js";
+
 // ฟังก์ชัน render หน้า login และ register (ใช้โดย pageRoutes)
 export const showLogin = (req, res) => {
     res.render("login");
@@ -10,42 +12,30 @@ export const showRegister = (req, res) => {
 
 // ฟังก์ชันแสดงหน้า home
 export const home = async (req, res) => {
-    try {
-        // โหลดรายการอัลบั้ม (public) เพื่อแสดงในหน้า home
-        let albums = [];
-        try {
-            const Album = (await import("../models/albumModel.js")).default;
-            albums = await Album.find({ status: "public" })
-                .sort({ createdAt: -1 })
-                .limit(20)
-                .populate({
-                    path: "images",
-                    select: "imageUrl originalname filename"
-                })
-                .lean();
-        } catch (err) {
-            console.warn("Album model not available or query failed:", err.message);
-            albums = [];
-        }
+  try {
+    const Album = (await import("../models/albumModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
 
-        // console.log("home albums sample:", albums.length ? albums[0] : "no albums");
+    // fetch public albums and populate owner (user) and images
+    let albums = await Album.find({ status: "public" })
+      .sort({ createdAt: -1 })
+      .populate({ path: "user", select: "username" })      // <-- populate user
+      .populate({ path: "images", select: "filename imageUrl title" })
+      .lean();
 
-        // ส่ง albums ให้ view เสมอ
-        return res.render("home", {
-            user: req.user || null,
-            posts: [],
-            albums,
-            error: null
-        });
-    } catch (err) {
-        console.error("home error:", err);
-        return res.render("home", {
-            user: req.user || null,
-            posts: [],
-            albums: [],
-            error: "Failed to load data"
-        });
-    }
+    // normalize cover and owner name
+    albums = albums.map(a => {
+      const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
+      const cover = first ? (first.imageUrl || (`/uploads/${first.filename}`)) : "/images/default-cover.jpg";
+      const ownerName = (a.user && a.user.username) ? a.user.username : (a.owner || "Unknown");
+      return { ...a, cover, owner: ownerName };
+    });
+
+    return res.render("home", { albums });
+  } catch (err) {
+    console.error("home error:", err);
+    return res.status(500).render("home", { albums: [] });
+  }
 };
 
 // ฟังก์ชัน render หน้า profile
@@ -92,6 +82,25 @@ export const showProfile = async (req, res) => {
 // ฟังก์ชันแสดงหน้าอัพโหลด
 export const showUpload = (req, res) => {
     res.render("upload", { error: null, success: null });
+};
+
+// ฟังก์ชันแสดงหน้ารายละเอียดรูปภาพ
+export const showImage = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!id) return res.status(400).send("Missing id");
+
+    const image = await Image.findById(id)
+      .populate("user", "username profilePic")
+      .lean();
+
+    if (!image) return res.status(404).send("Image not found");
+
+    return res.render("image", { image, currentUser: req.user || null });
+  } catch (err) {
+    console.error("showImage error:", err);
+    return res.status(500).send("Server error");
+  }
 };
 
 // ฟังก์ชันแสดงหน้าสร้างอัลบั้ม
