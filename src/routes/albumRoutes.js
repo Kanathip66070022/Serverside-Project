@@ -7,10 +7,10 @@ import { createAlbum, searchAlbums } from "../controllers/postController.js";
 
 const router = express.Router();
 
-// POST route สำหรับสร้างอัลบั้ม
-router.post("/createAlbum", authMiddleware, ensureLoggedIn, createAlbum);
-
 // Search route
 router.get("/search", authMiddleware, searchAlbums);
+
+// POST route สำหรับสร้างอัลบั้ม
+router.post("/createAlbum", authMiddleware, ensureLoggedIn, createAlbum);
 
 export default router;

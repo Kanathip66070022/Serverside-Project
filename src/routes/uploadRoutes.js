@@ -7,7 +7,7 @@ import { uploadImage, getImages } from "../controllers/uploadController.js";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, upload.single("image"), uploadImage); // POST /api/upload
 router.get("/gallery", getImages);               // GET  /api/upload/gallery
+router.post("/", authMiddleware, upload.single("image"), uploadImage); // POST /api/upload
 
 export default router;
