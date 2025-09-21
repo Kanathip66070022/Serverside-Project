@@ -50,50 +50,43 @@ export const home = async (req, res) => {
 
 // ฟังก์ชัน render หน้า profile
 export const showProfile = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-        }
+  try {
+    if (!req.user) return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
 
-        const User = (await import("../models/userModel.js")).default;
-        const Image = (await import("../models/imageModel.js")).default;
-        const Album = (await import("../models/albumModel.js")).default;
+    const User = (await import("../models/userModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
+    const Album = (await import("../models/albumModel.js")).default;
 
-        // ดึง user ใหม่จาก DB เพื่อให้ได้ค่าล่าสุด
-        const freshUser = await User.findById(req.user._id).lean();
+    // ดึง user ใหม่จาก DB และ populate profilePic
+    const freshUser = await User.findById(req.user._id)
+      .populate({ path: "profilePic", select: "filename imageUrl title" })
+      .lean();
 
-        // gallery = รูปของ user
-        const gallery = await Image.find({ user: req.user._id })
-            .sort({ createdAt: -1 })
-            .select("filename originalname imageUrl title")
-            .lean();
+    const gallery = await Image.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .select("filename originalname imageUrl title")
+      .lean();
 
-        // albums ของ user พร้อม populate images
-        let albums = await Album.find({ user: req.user._id })
-            .sort({ createdAt: -1 })
-            .populate({
-                path: "images",
-                select: "filename imageUrl title"
-            })
-            .lean();
+    let albums = await Album.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .populate({ path: "images", select: "filename imageUrl title" })
+      .lean();
 
-        // คำนวณ cover ของแต่ละอัลบั้ม (ใช้รูปแรกเป็น cover หรือ fallback)
-        albums = albums.map(a => {
-            const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
-            const cover = first ? (first.imageUrl || `/uploads/${first.filename}`) : "/images/default-cover.jpg";
-            return { ...a, cover };
-        });
+    albums = albums.map(a => {
+      const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
+      const cover = first ? (first.imageUrl || `/uploads/${first.filename}`) : "/images/default-cover.jpg";
+      return { ...a, cover };
+    });
 
-        // ส่งข้อมูลทั้งหมดให้ view (มั่นใจว่า albums ส่งเป็น array เสมอ)
-        return res.render("profile", {
-            user: freshUser || req.user,
-            gallery,
-            albums
-        });
-    } catch (err) {
-        console.error("showProfile error:", err);
-        return res.status(500).render("profile", { user: req.user || null, gallery: [], albums: [] });
-    }
+    return res.render("profile", {
+      user: freshUser || req.user,
+      gallery,
+      albums
+    });
+  } catch (err) {
+    console.error("showProfile error:", err);
+    return res.status(500).render("profile", { user: req.user || null, gallery: [], albums: [] });
+  }
 };
 
 // ฟังก์ชันแสดงหน้าอัพโหลด

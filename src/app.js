@@ -3,13 +3,15 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import path from "path";
+import methodOverride from "method-override";
 
 import swaggerSpec from "./config/swagger.js";
+
+import authMiddleware from "./middlewares/authMiddleware.js";
 
 import pageRoutes from "./routes/pageRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import authMiddleware from "./middlewares/authMiddleware.js";
 import albumRoutes from "./routes/albumRoutes.js";
 
 const app = express();
@@ -25,6 +27,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Middleware
 app.use(authMiddleware);
+app.use(methodOverride("_method"));
 
 // set current path for views
 app.use((req, res, next) => {

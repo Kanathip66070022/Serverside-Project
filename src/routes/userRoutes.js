@@ -11,8 +11,14 @@ const upload = multer({ dest: "uploads/" });
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.post("/profile/edit", authMiddleware, ensureLoggedIn, upload.single("profileImage"), updateProfile);
-router.post("/logout", authMiddleware, logoutUser);
+
+// PATCH route สำหรับอัปเดตโปรไฟล์ผู้ใช้ (เช่น ชื่อ, รูปโปรไฟล์)
+router.patch("/profile", authMiddleware, ensureLoggedIn, upload.single("profileImage"), updateProfile);
+
+// GET = convenient link (redirect back to home)
 router.get("/logout", authMiddleware, logoutUser);
+
+// POST = safer, for forms / AJAX / API 
+router.post("/logout", authMiddleware, logoutUser);
 
 export default router;

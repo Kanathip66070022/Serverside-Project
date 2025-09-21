@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   profilePic: {
-    type: String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Image",
   },
   albums: [{
     type: mongoose.Schema.Types.ObjectId,

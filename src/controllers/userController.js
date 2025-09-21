@@ -87,31 +87,52 @@ export const getUsers = async (req, res) => {
 
 // เพิ่ม handler สำหรับ POST /profile/edit
 export const updateProfile = async (req, res) => {
+  console.log("updateProfile called", {
+    user: req.user ? String(req.user._id) : null,
+    body: req.body,
+    file: req.file && req.file.filename
+  });
+
   try {
-    if (!req.user) {
-      return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-    }
+    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
 
     const User = (await import("../models/userModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
+
     const user = await User.findById(req.user._id);
-    if (!user) return res.redirect("/login");
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    // อัปเดตชื่อถ้ามี
+    // Update name / username
     if (req.body.name && String(req.body.name).trim()) {
-      user.name = String(req.body.name).trim();
+      const newName = String(req.body.name).trim();
+      user.username = newName; // keep schema-compatible
+      user.name = newName;     // optional if schema has name
     }
 
-    // อัปเดตรูปโปรไฟล์ถ้ามีไฟล์
-    if (req.file) {
-      // เก็บเป็น public path ที่ views ใช้ได้ตรง ๆ
-      user.profileImage = `/uploads/${req.file.filename}`;
+    // Select image from gallery
+    if (req.body.profileImageId) {
+      const img = await Image.findById(String(req.body.profileImageId));
+      if (img) user.profilePic = img._id;
+    } else if (req.file) {
+      // fallback: if user uploaded a new file, create Image doc and link
+      const newImg = await Image.create({
+        user: req.user._id,
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        imageUrl: `/uploads/${req.file.filename}`
+      });
+      user.profilePic = newImg._id;
     }
 
+    // Only save if changes detected (optional)
     await user.save();
-    return res.redirect("/profile");
+
+    // For API clients return JSON
+    const fresh = await User.findById(user._id).populate("profilePic").lean();
+    return res.status(200).json({ ok: true, user: fresh });
   } catch (err) {
     console.error("updateProfile error:", err);
-    return res.status(500).redirect("/profile");
+    return res.status(500).json({ error: err.message || "update failed" });
   }
 };
 
