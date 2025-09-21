@@ -88,6 +88,52 @@
     .back-btn:hover {
       background: #2980b9;
     }
+
+    .actions {
+      margin-top: 20px;
+    }
+
+    .actions a,
+    .actions button {
+      display: inline-block;
+      margin-right: 10px;
+      text-decoration: none;
+      background: #3498db;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      transition: background 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* ปุ่มดาวน์โหลด */
+    .actions .download-btn {
+      background: #27ae60;
+    }
+
+    .actions .download-btn:hover {
+      background: #1e8449;
+    }
+
+    /* ปุ่มแก้ไข */
+    .actions .edit-btn {
+      background: #f1c40f;
+    }
+
+    .actions .edit-btn:hover {
+      background: #d4ac0d;
+    }
+
+    /* ปุ่มลบ */
+    .actions .delete-btn {
+      background: #e74c3c;
+    }
+
+    .actions .delete-btn:hover {
+      background: #c0392b;
+    }
   </style>
 </head>
 
@@ -115,14 +161,35 @@
           </p>
         </div>
 
-        <!-- ปุ่มกลับ -->
-        <a href="javascript:history.back()" class="back-btn" style="margin-left: 10px;">← Back</a>
+        <!-- ปุ่ม Action -->
+        <% 
+          // ตรวจว่า user ปัจจุบันเป็นเจ้าของรูปหรือไม่
+          const currentUserId = (typeof currentUser !== 'undefined' && currentUser) ? String(currentUser._id || currentUser.id || '') :
+                                (typeof user !== 'undefined' && user) ? String(user._id || user.id || '') : '';
+          const imageOwnerId = image && image.user ? String(image.user._id || image.user) : '';
+          const isOwner = currentUserId && imageOwnerId && currentUserId === imageOwnerId;
+        %>
+        <div class="actions">
+          <!-- ปุ่มกลับ -->
+          <a href="javascript:history.back()" class="back-btn">← Back</a>
 
-        <!-- ปุ่มดาวน์โหลด -->
-        <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>" download="<%= image.title || 'download' %>"
-          class="back-btn" style="background: #27ae60; margin-left: 10px;">
-          ⬇ Download
-        </a>
+          <!-- ปุ่มดาวน์โหลด (ทุกคนเห็นได้) -->
+          <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>" download="<%= image.title || 'download' %>"
+            class="download-btn">⬇ Download</a>
+
+          <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
+          <% if (isOwner) { %>
+            <!-- ปุ่มแก้ไข -->
+            <a href="/image/<%= image._id || image.id %>/edit" class="edit-btn">✎ Edit</a>
+
+            <!-- ปุ่มลบ -->
+            <form action="/image/<%= image._id || image.id %>?_method=DELETE" method="POST" style="display:inline;"
+              onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบภาพนี้?');">
+              <button type="submit" class="delete-btn">🗑 Delete</button>
+            </form>
+          <% } %>
+        </div>
+
       </div>
     </div>
 </body>

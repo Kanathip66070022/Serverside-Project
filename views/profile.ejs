@@ -204,6 +204,19 @@
       line-height: 1.2;
       max-height: calc(1.2em * 2);
     }
+
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #c0392b;
+    }
   </style>
 </head>
 
@@ -307,13 +320,23 @@
               <input type="hidden" name="profileImageId" id="profileImageId" value="">
             </div>
 
-            <div class="modal-actions">
-              <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
-              <button type="submit" class="save-btn">Save</button>
+            <div class="modal-actions" style="display:flex;justify-content:space-between;align-items:center;">
+              <!-- ปุ่มลบโปรไฟล์ -->
+              <form id="deleteForm" action="/api/users/profile?_method=DELETE" method="POST"
+                onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโปรไฟล์นี้? การลบจะไม่สามารถย้อนกลับได้');">
+                <button type="submit" class="delete-btn">🗑 Delete Profile</button>
+              </form>
+
+              <div>
+                <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+                <button type="submit" class="save-btn">Save</button>
+              </div>
             </div>
-          </form>
+
         </div>
+        </form>
       </div>
+    </div>
     </div>
 
     <script>
