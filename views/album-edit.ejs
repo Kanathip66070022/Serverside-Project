@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Edit Album</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f6fa;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    h3 {
+      margin-top: 30px;
+      margin-bottom: 12px;
+      font-size: 20px;
+      color: #34495e;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+      color: #444;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease-in-out;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    .cancel-link {
+      margin-left: 8px;
+      font-size: 14px;
+      color: #7f8c8d;
+      text-decoration: none;
+    }
+
+    .cancel-link:hover {
+      text-decoration: underline;
+    }
+
+    .upload-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .img-card {
+      width: 170px;
+      border: 1px solid #eee;
+      padding: 10px;
+      border-radius: 10px;
+      background: #fafafa;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .img-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .img-card img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .img-card p {
+      margin: 10px 0 8px;
+      font-size: 13px;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .img-card button {
+      background: #e74c3c;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    .img-card button:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('partials/header') %>
+  <div class="container">
+    <h1>Edit Album</h1>
+
+    <!-- album meta edit -->
+    <form action="/api/albums/<%= album._id %>?_method=PUT" method="POST">
+      <label>Title</label>
+      <input name="title" value="<%= album.title %>" required />
+
+      <label>Content</label>
+      <textarea name="content" rows="4"><%= album.content %></textarea>
+
+      <label>Status</label>
+      <select name="status">
+        <option value="public" <%= album.status === 'public' ? 'selected' : '' %>>Public</option>
+        <option value="private" <%= album.status === 'private' ? 'selected' : '' %>>Private</option>
+      </select>
+
+      <div style="margin-top:16px;">
+        <button type="submit">💾 Save</button>
+        <a href="/album/<%= album._id %>" class="cancel-link">Cancel</a>
+      </div>
+    </form>
+
+    <!-- upload existing image -->
+    <h3>Add existing image to album</h3>
+    <form id="addExistingForm" action="/api/albums/<%= album._id %>/images" method="POST" class="upload-row">
+      <select name="imageId" required>
+        <option value="">-- เลือกรูปจากคลังของคุณ --</option>
+        <% (availableImages || []).forEach(img => { %>
+          <option value="<%= img._id %>"><%= img.title || img.originalname || img.filename %></option>
+        <% }) %>
+      </select>
+      <button type="submit">➕ Add</button>
+    </form>
+
+    <!-- album images -->
+    <h3>Images</h3>
+    <div id="imagesGrid" class="grid">
+      <% if (Array.isArray(album.images) && album.images.length) { %>
+      <% album.images.forEach(img => { %>
+      <div class="img-card" data-id="<%= img._id || img.id %>">
+        <a href="/image/<%= img._id || img.id %>">
+          <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+            alt="<%= img.title || img.originalname || 'image' %>" />
+        </a>
+        <p title="<%= img.title || img.originalname || '' %>">
+          <%= img.title || img.originalname || img.filename || 'image' %>
+        </p>
+
+        <% 
+          const currentUserId = (typeof user !== 'undefined' && user) ? String(user._id || user.id || '') : '';
+          const imageOwnerId = img && img.user ? String(img.user._id || img.user) : '';
+          const isOwner = currentUserId && imageOwnerId && currentUserId === imageOwnerId;
+        %>
+        <% if (isOwner) { %>
+        <button class="delete-img-btn">🗑 Delete</button>
+        <% } %>
+      </div>
+      <% }) %>
+      <% } else { %>
+      <p>No images in this album.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // delete image handler
+    document.querySelectorAll('.delete-img-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const card = e.target.closest('.img-card');
+        const imageId = card?.dataset.id;
+        if (!imageId) return alert('Missing image id');
+        if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรูปนี้?')) return;
+        try {
+          const res = await fetch(`/api/albums/<%= album._id %>/images/${imageId}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok) {
+            card.remove();
+            return;
+          }
+          alert(data?.error || 'Delete failed');
+        } catch (err) {
+          console.error(err);
+          alert('Network error');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

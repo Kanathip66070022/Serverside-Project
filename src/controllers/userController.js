@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
 
 import User from "../models/userModel.js";
 
@@ -38,29 +40,36 @@ export const registerUser = async (req, res) => {
 // Login user
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
+    const User = (await import("../models/userModel.js")).default;
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).render("login", { error: "Invalid credentials" });
+    if (!user) {
+      if (req.headers.accept && req.headers.accept.includes("application/json")) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      return res.status(401).render("login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+    }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).render("login", { error: "Invalid credentials" });
+    const bcrypt = (await import("bcrypt")).default;
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) {
+      if (req.headers.accept && req.headers.accept.includes("application/json")) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      return res.status(401).render("login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+    }
 
+    // สร้าง token / เซ็ต cookie ตามเดิม
+    const jwt = (await import("jsonwebtoken")).default;
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "7d" });
-
-    // ตั้ง httpOnly cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    // redirect ไป /home เว้นแต่มี ?next=...
-    const redirectTo = req.query.next || "/home";
-    return res.redirect(redirectTo);
+    res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+    return res.redirect("/home");
   } catch (err) {
     console.error("loginUser error:", err);
-    return res.status(500).render("login", { error: "Login failed" });
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(500).json({ error: "Server error" });
+    }
+    return res.status(500).render("login", { error: "เกิดข้อผิดพลาด ลองอีกครั้ง" });
   }
 };
 
@@ -136,4 +145,49 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export default { registerUser, loginUser, logoutUser, getUsers, updateProfile };
+export const deleteProfile = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+    const User = (await import("../models/userModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
+    const Album = (await import("../models/albumModel.js")).default;
+
+    const userId = String(req.user._id);
+
+    // find user's images, try to remove files
+    const images = await Image.find({ user: userId }).lean();
+    await Promise.all(images.map(async img => {
+      try {
+        if (img.filename) {
+          const p = path.join(process.cwd(), "uploads", img.filename);
+          await fs.promises.unlink(p).catch(() => null);
+        }
+      } catch (_) { /* ignore */ }
+    }));
+
+    // remove image docs and albums
+    await Image.deleteMany({ user: userId });
+    await Album.deleteMany({ user: userId });
+
+    // remove user
+    await User.findByIdAndDelete(userId);
+
+    // clear auth cookie
+    res.clearCookie("token");
+
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(200).json({ ok: true });
+    }
+    return res.redirect("/");
+
+  } catch (err) {
+    console.error("deleteProfile error:", err);
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(500).json({ error: "Delete failed" });
+    }
+    return res.status(500).redirect("/profile");
+  }
+};
+
+export default { registerUser, loginUser, logoutUser, getUsers, updateProfile, deleteProfile };

@@ -162,3 +162,53 @@ export const showAlbum = async (req, res) => {
         return res.status(500).render("album", { album: null });
     }
 };
+
+export const editAlbumPage = async (req, res) => {
+  try {
+    const Album = (await import("../models/albumModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
+    const id = req.params.id;
+
+    const album = await Album.findById(id)
+      .populate({ path: "images", select: "filename imageUrl title user originalname" })
+      .populate({ path: "user", select: "username name" })
+      .lean();
+    if (!album) return res.status(404).render("404");
+
+    // get images belonging to current user that are NOT already in this album
+    const currentUserId = req.user ? String(req.user._id) : null;
+    let availableImages = [];
+    if (currentUserId) {
+      const excludeIds = Array.isArray(album.images) ? album.images.map(i => String(i._id || i)) : [];
+      availableImages = await Image.find({ user: currentUserId, _id: { $nin: excludeIds } })
+        .select("title filename originalname imageUrl")
+        .lean();
+    }
+
+    return res.render("album-edit", { album, user: req.user, availableImages, currentPath: req.path });
+  } catch (err) {
+    console.error("editAlbumPage error:", err);
+    return res.status(500).redirect(`/album/${req.params.id}`);
+  }
+};
+
+export const editImagePage = async (req, res) => {
+  try {
+    const Image = (await import("../models/imageModel.js")).default;
+    const id = req.params.id;
+    const image = await Image.findById(id).populate({ path: "user", select: "username name" }).lean();
+    if (!image) return res.status(404).render("404");
+
+    const currentUserId = req.user ? String(req.user._id) : "";
+    const imageOwnerId = image.user ? String(image.user._id || image.user) : "";
+    // ให้เฉพาะเจ้าของรูปเข้าถึงหน้าแก้ไขได้
+    if (!currentUserId || currentUserId !== imageOwnerId) {
+      return res.status(403).redirect(`/image/${id}`);
+    }
+
+    return res.render("image-edit", { image, user: req.user, currentPath: req.path });
+  } catch (err) {
+    console.error("editImagePage error:", err);
+    return res.status(500).redirect(`/image/${req.params.id}`);
+  }
+};
