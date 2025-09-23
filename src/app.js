@@ -23,11 +23,11 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method")); // ถ้าใช้ _method
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Middleware
 app.use(authMiddleware);
-app.use(methodOverride("_method"));
 
 // set current path for views
 app.use((req, res, next) => {

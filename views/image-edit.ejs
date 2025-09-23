@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Edit Image</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 24px 28px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 26px;
+      color: #34495e;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .thumb {
+      width: 180px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    .actions {
+      margin-top: 22px;
+      display: flex;
+      gap: 10px;
+    }
+
+    button,
+    .btn-cancel {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    button {
+      background: #3498db;
+      color: #fff;
+    }
+
+    button:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+      background: #7f8c8d;
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+      line-height: 1.4;
+    }
+
+    .btn-cancel:hover {
+      background: #606e73;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+  <main class="container">
+    <h1>Edit Image</h1>
+
+    <form action="/api/upload/images/<%= image._id %>?_method=PATCH" method="POST" enctype="multipart/form-data">
+      <label>Preview</label>
+      <div class="row">
+        <img class="thumb" src="<%= image.imageUrl || ('/uploads/' + image.filename) %>" alt="thumb">
+      </div>
+
+      <label>Title</label>
+      <input name="title" value="<%= image.title %>" />
+
+      <label>Content</label>
+      <textarea name="content" rows="5"><%= image.content %></textarea>
+
+      <label>Replace file (optional)</label>
+      <input type="file" name="image" accept="image/*" />
+
+      <div class="actions">
+        <button type="submit">💾 Save</button>
+        <a href="/image/<%= image._id %>" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

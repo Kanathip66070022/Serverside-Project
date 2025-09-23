@@ -3,7 +3,7 @@
     <a href="/home">📷 CloudPostIt</a>
   </div>
 
-  <% if (typeof currentPath !=='undefined' && (currentPath==='/home' || currentPath==='/search' )) { %>
+  <% if (typeof currentPath !=='undefined' && (currentPath==='/home' || currentPath==='/api/albums/search' )) { %>
     <form class="search-bar" action="/api/albums/search" method="get">
       <input type="text" name="q" placeholder="Search albums"
         value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" />

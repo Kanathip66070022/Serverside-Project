@@ -56,24 +56,6 @@
       color: #555;
     }
 
-    .status {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .public {
-      background: #2ecc71;
-      color: white;
-    }
-
-    .private {
-      background: #e74c3c;
-      color: white;
-    }
-
     .back-btn {
       display: inline-block;
       margin-top: 20px;
@@ -134,6 +116,67 @@
     .actions .delete-btn:hover {
       background: #c0392b;
     }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 400px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.3s;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      margin-top: 5px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .save-btn {
+      margin-top: 15px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .save-btn:hover {
+      background: #1e8449;
+    }
+
+    .close {
+      float: right;
+      font-size: 22px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -163,27 +206,25 @@
 
         <!-- ปุ่ม Action -->
         <% 
-          // ตรวจว่า user ปัจจุบันเป็นเจ้าของรูปหรือไม่
-          const currentUserId = (typeof currentUser !== 'undefined' && currentUser) ? String(currentUser._id || currentUser.id || '') :
-                                (typeof user !== 'undefined' && user) ? String(user._id || user.id || '') : '';
+          const currentUserId = (typeof user !== 'undefined' && user) ? String(user._id || user.id || '') : '';
           const imageOwnerId = image && image.user ? String(image.user._id || image.user) : '';
           const isOwner = currentUserId && imageOwnerId && currentUserId === imageOwnerId;
         %>
+
         <div class="actions">
           <!-- ปุ่มกลับ -->
           <a href="javascript:history.back()" class="back-btn">← Back</a>
 
           <!-- ปุ่มดาวน์โหลด (ทุกคนเห็นได้) -->
-          <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>" download="<%= image.title || 'download' %>"
-            class="download-btn">⬇ Download</a>
+          <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>" download="<%= image.title || 'download' %>" class="download-btn">⬇ Download</a>
 
           <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
           <% if (isOwner) { %>
-            <!-- ปุ่มแก้ไข -->
-            <a href="/image/<%= image._id || image.id %>/edit" class="edit-btn">✎ Edit</a>
+            <!-- ไปยังหน้าแก้ไขที่แยกเป็นหน้าใหม่ -->
+            <a href="/image/<%= image._id %>/edit" class="edit-btn">✎ Edit</a>
 
-            <!-- ปุ่มลบ -->
-            <form action="/image/<%= image._id || image.id %>?_method=DELETE" method="POST" style="display:inline;"
+            <!-- ลบโดยใช้ form + method-override เป็น fallback -->
+            <form action="/api/upload/images/<%= image._id %>?_method=DELETE" method="POST" style="display:inline;"
               onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบภาพนี้?');">
               <button type="submit" class="delete-btn">🗑 Delete</button>
             </form>
@@ -192,6 +233,100 @@
 
       </div>
     </div>
-</body>
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h2>Edit Image</h2>
+        <!-- action="#" to avoid native PUT; JS will send PATCH -->
+        <form id="editForm" method="POST" action="#">
+          <label>Title</label>
+          <input type="text" name="title" value="<%= image.title %>" required>
 
+          <label>Content</label>
+          <textarea name="content" rows="4"><%= image.content %></textarea>
+
+          <button type="submit" class="save-btn">💾 Save</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- scripts: delete + modal + edit handler (must be inside body) -->
+    <script>
+      // delete handler (uses API route)
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          // if inside a form, allow form submit to handle _method; otherwise use fetch
+          const form = btn.closest('form');
+          if (form && form.getAttribute('method')?.toUpperCase() === 'POST') {
+            // leave native form (method-override) to handle it
+            return;
+          }
+          if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบภาพนี้?')) return;
+          const id = "<%= image._id %>";
+          try {
+            const res = await fetch(`/api/upload/images/${id}`, {
+              method: 'DELETE',
+              credentials: 'same-origin',
+              headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json().catch(()=>null);
+            if (res.ok) {
+              window.location = '/home';
+              return;
+            }
+            alert(data?.error || 'Delete failed');
+          } catch (err) {
+            console.error(err);
+            alert('Network error');
+          }
+        });
+      });
+
+      // modal open/close helpers
+      window.openEditModal = () => document.getElementById('editModal')?.style.display = 'block';
+      window.closeEditModal = () => document.getElementById('editModal')?.style.display = 'none';
+      window.addEventListener('click', (e) => {
+        const m = document.getElementById('editModal');
+        if (m && e.target === m) window.closeEditModal();
+      });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.closeEditModal(); });
+
+      // edit form: bind with debug logs
+      (function(){
+        const editForm = document.getElementById('editForm');
+        if (!editForm) {
+          console.log('editForm not found');
+          return;
+        }
+        editForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          console.log('editForm submit fired');
+          if (!confirm('บันทึกการเปลี่ยนแปลง?')) { console.log('edit cancelled'); return; }
+          const id = "<%= image._id %>";
+          const fd = new FormData(editForm);
+          try {
+            const res = await fetch(`/api/upload/images/${id}`, {
+              method: 'PATCH',
+              credentials: 'same-origin',
+              body: fd,
+              headers: { 'Accept': 'application/json' }
+            });
+            console.log('PATCH response status', res.status);
+            const data = await res.json().catch(()=>null);
+            console.log('PATCH response body', data);
+            if (res.ok) {
+              window.location = `/image/${id}`;
+              return;
+            }
+            alert(data?.error || 'Update failed');
+          } catch (err) {
+            console.error('edit error', err);
+            alert('Network error');
+          }
+        });
+      })();
+    </script>
+  </body>
+  
 </html>

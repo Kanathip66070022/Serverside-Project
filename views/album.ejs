@@ -244,7 +244,7 @@
             <% if (isOwner) { %>
               <a href="/album/<%= album._id || album.id %>/edit" class="edit">✎ Edit</a>
 
-              <form action="/album/<%= album._id || album.id %>?_method=DELETE" method="POST" style="display:inline;"
+              <form action="/api/albums/<%= album._id %>?_method=DELETE" method="POST" style="display:inline;"
                 onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบอัลบั้มนี้?');">
                 <button type="submit" class="delete">🗑 Delete</button>
               </form>
