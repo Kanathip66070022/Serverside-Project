@@ -207,8 +207,11 @@
 
           <!-- Submit -->
           <div class="form-group">
-            <button type="submit" class="submit-btn">Save Album</button>
+            <button type="submit" class="submit-btn" id="createAlbumBtn">Save Album</button>
           </div>
+
+          <!-- result message -->
+          <div id="createAlbumMsg" aria-live="polite" style="margin-top:12px;font-weight:600;color:#2ecc71;display:none;"></div>
         </form>
       </div>
 
@@ -229,6 +232,53 @@
             statusText.textContent = "Public";
           }
         });
+
+        (function(){
+          const form = document.querySelector('form[action="/api/albums/createAlbum"]');
+          const msgEl = document.getElementById('createAlbumMsg');
+          const btn = document.getElementById('createAlbumBtn');
+          if (!form) return;
+
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msgEl.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const fd = new FormData(form);
+            // ensure status value is sent correctly (checkbox logic kept in page)
+            try {
+              const res = await fetch(form.action, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: new URLSearchParams(fd) // form is urlencoded on server
+              });
+              if (res.ok) {
+                // show success message
+                msgEl.style.color = '#2ecc71';
+                msgEl.textContent = 'Album created successfully';
+                msgEl.style.display = 'block';
+                // optionally reset form
+                form.reset();
+                // keep default status text behavior
+                document.getElementById('statusText').textContent = 'Public';
+              } else {
+                const text = await res.text().catch(()=>null);
+                msgEl.style.color = '#e74c3c';
+                msgEl.textContent = text || 'เกิดข้อผิดพลาดในการสร้างอัลบั้ม';
+                msgEl.style.display = 'block';
+              }
+            } catch (err) {
+              msgEl.style.color = '#e74c3c';
+              msgEl.textContent = 'Network error';
+              msgEl.style.display = 'block';
+              console.error(err);
+            } finally {
+              btn.disabled = false;
+              btn.textContent = 'Save Album';
+            }
+          });
+        })();
       </script>
     </div>
 </body>
