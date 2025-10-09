@@ -105,33 +105,26 @@ export const showImage = async (req, res) => {
 
 // ฟังก์ชันแสดงหน้าสร้างอัลบั้ม
 export const showCreateAlbum = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-        }
+  try {
+    const Tag = (await import("../models/tagModel.js")).default;
+    const Image = (await import("../models/imageModel.js")).default;
 
-        const Image = await import("../models/imageModel.js");
-        const images = await Image.default.find({ user: req.user._id })
-            .sort({ createdAt: -1 })
-            .select("filename originalname title _id");
+    const tags = (await Tag.find().select("title").lean()) || [];
+    tags.forEach(t => { t.name = t.title; });
 
-        // Check for success query param
-        const success = req.query.success === "1" ? "Album created successfully!" : null;
-
-        res.render("createAlbum", {
-            images,
-            error: null,
-            success: success
-        });
-
-    } catch (err) {
-        console.error("showCreateAlbum error:", err);
-        res.status(500).render("createAlbum", {
-            images: [],
-            error: "Failed to load images",
-            success: null
-        });
+    let images = [];
+    if (req.user) {
+      images = await Image.find({ user: req.user._id })
+        .select("title originalname filename imageUrl")
+        .sort({ createdAt: -1 })
+        .lean();
     }
+
+    return res.render("createAlbum", { user: req.user, tags, images, currentPath: req.path });
+  } catch (err) {
+    console.error("showCreateAlbum error:", err);
+    return res.status(500).redirect("/home");
+  }
 };
 
 // แสดงหน้าอัลบั้ม (GET /album/:id)
@@ -141,20 +134,28 @@ export const showAlbum = async (req, res) => {
         const Image = (await import("../models/imageModel.js")).default;
 
         const album = await Album.findById(req.params.id)
-            .populate({ path: "user", select: "username name" }) // <-- populate owner
+            .populate({ path: "user", select: "username name" })
             .populate({ path: "images", select: "filename imageUrl title content" })
+            .populate({ path: "tags", select: "title" }) // <-- populate tags
             .lean();
 
         if (!album) return res.status(404).render("404");
 
-        // optional: compute cover fallback
         const cover = (album.images && album.images[0])
             ? (album.images[0].imageUrl || `/uploads/${album.images[0].filename}`)
             : "/images/default-cover.jpg";
 
-        // ensure album.user has a displayable name
         album.user = album.user || {};
         album.user.name = album.user.name || album.user.username || "Unknown";
+
+        // normalize tags: support populated docs or plain string ids
+        album.tags = (album.tags || []).map(t => {
+            if (!t) return null;
+            if (typeof t === "string") return { _id: t, title: t };
+            if (t.title) return t;
+            if (t._id) return { _id: t._id, title: String(t._id) };
+            return null;
+        }).filter(Boolean);
 
         return res.render("album", { album: { ...album, cover } });
     } catch (err) {
@@ -167,25 +168,31 @@ export const editAlbumPage = async (req, res) => {
   try {
     const Album = (await import("../models/albumModel.js")).default;
     const Image = (await import("../models/imageModel.js")).default;
+    const Tag = (await import("../models/tagModel.js")).default;
     const id = req.params.id;
 
     const album = await Album.findById(id)
       .populate({ path: "images", select: "filename imageUrl title user originalname" })
       .populate({ path: "user", select: "username name" })
+      .populate({ path: "tags", select: "title" }) // ensure tag titles available
       .lean();
+
     if (!album) return res.status(404).render("404");
 
-    // get images belonging to current user that are NOT already in this album
     const currentUserId = req.user ? String(req.user._id) : null;
-    let availableImages = [];
-    if (currentUserId) {
-      const excludeIds = Array.isArray(album.images) ? album.images.map(i => String(i._id || i)) : [];
-      availableImages = await Image.find({ user: currentUserId, _id: { $nin: excludeIds } })
-        .select("title filename originalname imageUrl")
-        .lean();
-    }
 
-    return res.render("album-edit", { album, user: req.user, availableImages, currentPath: req.path });
+    // available images (user's images not already in this album)
+    const excludeIds = Array.isArray(album.images) ? album.images.map(i => String(i._id || i)) : [];
+    const availableImages = currentUserId
+      ? await Image.find({ user: currentUserId, _id: { $nin: excludeIds } })
+          .select("title filename originalname imageUrl")
+          .lean()
+      : [];
+
+    // all tags for the select box
+    const allTags = await Tag.find().sort({ title: 1 }).lean();
+
+    return res.render("album-edit", { album, user: req.user, availableImages, allTags, currentPath: req.path });
   } catch (err) {
     console.error("editAlbumPage error:", err);
     return res.status(500).redirect(`/album/${req.params.id}`);
@@ -210,5 +217,61 @@ export const editImagePage = async (req, res) => {
   } catch (err) {
     console.error("editImagePage error:", err);
     return res.status(500).redirect(`/image/${req.params.id}`);
+  }
+};
+
+export const showTags = async (req, res) => {
+  try {
+    const Tag = (await import("../models/tagModel.js")).default;
+    const Album = (await import("../models/albumModel.js")).default;
+
+    const tags = await Tag.find().sort({ title: 1 }).lean();
+
+    // aggregate counts of albums per tag
+    const counts = await Album.aggregate([
+      { $match: { tags: { $exists: true, $ne: [] } } },
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } }
+    ]);
+
+    const countMap = counts.reduce((m, c) => { m[String(c._id)] = c.count; return m; }, {});
+    tags.forEach(t => { t.count = countMap[String(t._id)] || 0; });
+
+    return res.render("tags", { user: req.user, tags, currentPath: req.path });
+  } catch (err) {
+    console.error("showTags error:", err);
+    return res.status(500).redirect("/home");
+  }
+};
+
+export const showTagAlbums = async (req, res) => {
+  try {
+    const Tag = (await import("../models/tagModel.js")).default;
+    const Album = (await import("../models/albumModel.js")).default;
+    const id = req.params.id;
+
+    const tag = await Tag.findById(id).lean();
+    if (!tag) return res.status(404).render("404");
+
+    // find albums that reference this tag (only public or you can change logic)
+    const albums = await Album.find({ tags: id })
+      .populate({ path: "images", select: "filename imageUrl" })
+      .populate({ path: "user", select: "username name" })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // prepare cover and owner display
+    const normalized = albums.map(a => {
+      const cover = (a.images && a.images[0])
+        ? (a.images[0].imageUrl || `/uploads/${a.images[0].filename}`)
+        : "/images/default-cover.jpg";
+      const owner = (a.user && (a.user.name || a.user.username)) || a.owner || "Unknown";
+      return { ...a, cover, owner };
+    });
+
+    return res.render("tag-album", { albums: normalized, tag, user: req.user, currentPath: req.path });
+  } catch (err) {
+    console.error("showTagAlbums error:", err);
+    return res.status(500).redirect("/home");
   }
 };

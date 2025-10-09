@@ -92,7 +92,6 @@
       color: #777;
     }
 
-    /* truncate title (1 line) and content (max 2 lines) */
     .caption .album-title {
       display: block;
       overflow: hidden;
@@ -107,7 +106,6 @@
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      /* show max 2 lines */
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -116,7 +114,6 @@
       font-size: 13px;
       line-height: 1.2;
       max-height: calc(1.2em * 2);
-      /* fallback */
     }
 
     .back-btn {
@@ -141,6 +138,34 @@
       border-radius: 10px;
       font-size: 15px;
       color: #555;
+    }
+
+    /* 🎯 ส่วนแท็ก */
+    .tags {
+      margin-top: 15px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .tag:hover {
+      background: #bbdefb;
+      color: #0d47a1;
     }
 
     .actions {
@@ -181,11 +206,11 @@
 </head>
 
 <body>
-
   <%- include('partials/header') %>
 
     <div class="body">
       <div class="container">
+
         <!-- ข้อมูลอัลบั้ม -->
         <h1>
           <%= album.title %>
@@ -215,13 +240,12 @@
                   <% } %>
         </div>
 
+        <!-- ข้อมูลเพิ่มเติม -->
         <div class="meta">
-          <p>
-            <strong>Content:</strong>
+          <p><strong>Content:</strong>
             <%= album.content || "ไม่มีรายละเอียด" %>
           </p>
-          <p>
-            <strong>By:</strong>
+          <p><strong>By:</strong>
             <%= album.user ? album.user.name : "Unknown" %>
           </p>
           <p><strong>Status:</strong>
@@ -230,12 +254,32 @@
               <% } else { %>
                 <span class="status public">Public</span>
                 <% } %>
+          </p>
+
+          <!-- 🎯 ส่วนแสดง Tags -->
+          <% if (album.tags && album.tags.length) { %>
+            <div class="tags">
+              <div class="tag-list">
+                <strong>Tags:</strong>
+                <% album.tags.forEach(tag=> { %>
+                  <a href="/tags/<%= tag._id || tag.id %>" class="tag">
+                    #<%= tag.title %>
+                  </a>
+                  <% }) %>
+              </div>
+            </div>
+            <% } else { %>
+              <div class="tags">
+                <strong>Tags:</strong> <span style="color:#777;">ไม่มีแท็ก</span>
+              </div>
+              <% } %>
         </div>
 
         <!-- ปุ่ม Action -->
-        <% const currentUserId=(typeof user !=='undefined' && user) ? String(user._id || user.id || '' ) : '' ; const
-          albumOwnerId=album && album.user ? String(album.user._id || album.user) : '' ; const isOwner=currentUserId &&
-          albumOwnerId && currentUserId===albumOwnerId; %>
+        <% const currentUserId=(typeof user!=='undefined' && user)?String(user._id||user.id||''):''; const
+          albumOwnerId=album&&album.user?String(album.user._id||album.user):''; const
+          isOwner=currentUserId&&albumOwnerId&&currentUserId===albumOwnerId; %>
+
           <div class="actions">
             <a href="#" class="back-btn"
               onclick="if (history.length > 1) { history.back(); } else { window.location = '/home'; } return false;">←
@@ -243,7 +287,6 @@
 
             <% if (isOwner) { %>
               <a href="/album/<%= album._id || album.id %>/edit" class="edit">✎ Edit</a>
-
               <form action="/api/albums/<%= album._id %>?_method=DELETE" method="POST" style="display:inline;"
                 onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบอัลบั้มนี้?');">
                 <button type="submit" class="delete">🗑 Delete</button>

@@ -1,59 +1,50 @@
 export const createAlbum = async (req, res) => {
   try {
-    if (!req.user) return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-
-    const { title, content } = req.body;
-
-    // อ่านค่า images จาก form หลายรูป (รองรับกรณี string หรือ array หรือ stringified array)
-    let selected = req.body.images || req.body["images[]"] || [];
-    if (typeof selected === "string") {
-      if (selected.trim().startsWith("[")) {
-        // try parse simple stringified array like "['id','id']" or '["id","id"]'
-        selected = selected.replace(/^\[|\]$/g, "").split(",").map(s => s.replace(/['"\s]/g, "")).filter(Boolean);
-      } else {
-        selected = [selected];
-      }
-    }
-    const imageIds = Array.isArray(selected) ? selected.map(s => String(s).trim()).filter(Boolean) : [];
-
-    // โหลดรูปของ user เพื่อแสดงเมื่อมี error
-    const Image = (await import("../models/imageModel.js")).default;
-    const userImages = await Image.find({ user: req.user._id }).sort({ createdAt: -1 }).select("filename originalname title _id");
-
-    if (!title?.trim() || imageIds.length === 0) {
-      return res.status(400).render("createAlbum", {
-        images: userImages,
-        error: "กรุณากรอกชื่ออัลบั้มและเลือกรูปอย่างน้อย 1 รูป",
-        success: null
-      });
-    }
-
-    // ตรวจว่า id ที่ส่งมาเป็นรูปของผู้ใช้จริง
-    const imagesFound = await Image.find({ _id: { $in: imageIds }, user: req.user._id }).select("_id");
-    if (imagesFound.length !== imageIds.length) {
-      return res.status(400).render("createAlbum", {
-        images: userImages,
-        error: "บางรูปที่เลือกไม่พบหรือไม่ได้เป็นของคุณ",
-        success: null
-      });
-    }
-
     const Album = (await import("../models/albumModel.js")).default;
-    await Album.create({
-      title: title.trim(),
-      content: content || "",
-      images: imagesFound.map(i => i._id), // เก็บ ObjectId
-      user: req.user._id,
-      status: req.body.status || "public"
+    const Tag = (await import("../models/tagModel.js")).default;
+
+    // helper to normalize single/array values
+    const toArray = v => {
+      if (!v) return [];
+      return Array.isArray(v) ? v : [v];
+    };
+
+    const images = toArray(req.body.images || req.body['images[]']);
+    const rawTags = toArray(req.body.tags || req.body['tags[]']);
+    const title = (req.body.title || "").trim();
+    const content = req.body.content || "";
+    const status = req.body.status || "public";
+
+    if (!title) return res.status(400).send("Title is required");
+
+    // validate tags exist and keep only valid ids
+    let validTagIds = [];
+    if (rawTags.length) {
+      const found = await Tag.find({ _id: { $in: rawTags } }).select("_id").lean();
+      validTagIds = found.map(t => String(t._id));
+    }
+
+    const album = new Album({
+      title,
+      content,
+      user: req.user ? req.user._id : null,
+      images,
+      tags: validTagIds,
+      status
     });
 
-    return res.redirect("/album/create?success=1");
+    await album.save();
+
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(201).json({ ok: true, album });
+    }
+    return res.redirect(`/album/${album._id}`);
   } catch (err) {
     console.error("createAlbum error:", err);
-    // ในกรณี error ให้ส่ง images กลับเพื่อไม่ให้ view พัง
-    const Image = (await import("../models/imageModel.js")).default;
-    const userImages = await Image.find({ user: req.user?._id }).select("filename originalname title _id");
-    return res.status(500).render("createAlbum", { images: userImages || [], error: "เกิดข้อผิดพลาด กรุณาลองใหม่", success: null });
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(500).json({ error: "Create album failed" });
+    }
+    return res.status(500).redirect("/createAlbum");
   }
 };
 
@@ -269,5 +260,71 @@ export const updateAlbum = async (req, res) => {
   } catch (err) {
     console.error("updateAlbum error:", err);
     return res.status(500).redirect(`/album/${req.params.id}`);
+  }
+};
+
+export const addTagsToAlbum = async (req, res) => {
+  try {
+    const albumId = req.params.id;
+    const tagIds = Array.isArray(req.body.tagIds) ? req.body.tagIds : (req.body.tagIds ? [req.body.tagIds] : []);
+    if (!tagIds.length) return res.status(400).json({ error: "No tags provided" });
+
+    const Album = (await import("../models/albumModel.js")).default;
+    const Tag = (await import("../models/tagModel.js")).default;
+
+    const album = await Album.findById(albumId);
+    if (!album) return res.status(404).json({ error: "Album not found" });
+
+    // only album owner can add tags
+    if (!req.user || String(album.user) !== String(req.user._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // validate tags exist
+    const tags = await Tag.find({ _id: { $in: tagIds } }).lean();
+    const validIds = tags.map(t => String(t._id));
+
+    album.tags = album.tags || [];
+    const existing = new Set(album.tags.map(String));
+    const added = [];
+    validIds.forEach(id => {
+      if (!existing.has(id)) {
+        album.tags.push(id);
+        added.push(id);
+      }
+    });
+
+    if (added.length) await album.save();
+
+    // return added tags (full docs)
+    const addedTags = tags.filter(t => added.includes(String(t._id)));
+
+    return res.status(201).json({ ok: true, addedTags });
+  } catch (err) {
+    console.error("addTagsToAlbum error:", err);
+    return res.status(500).json({ error: "Add tags failed" });
+  }
+};
+
+export const removeTagFromAlbum = async (req, res) => {
+  try {
+    const albumId = req.params.id;
+    const tagId = req.params.tagId;
+    const Album = (await import("../models/albumModel.js")).default;
+
+    const album = await Album.findById(albumId);
+    if (!album) return res.status(404).json({ error: "Album not found" });
+
+    // only album owner can remove tags
+    if (!req.user || String(album.user) !== String(req.user._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    await Album.findByIdAndUpdate(albumId, { $pull: { tags: tagId } }).exec();
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("removeTagFromAlbum error:", err);
+    return res.status(500).json({ error: "Remove tag failed" });
   }
 };

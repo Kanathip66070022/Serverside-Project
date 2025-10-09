@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการ Tags</title>
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --card: #fff;
+            --primary: #2563eb;
+            --border: #e5e7eb;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --text: #333;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        /* ฟอร์มเพิ่ม Tag */
+        form.add-form {
+            background: var(--card);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 30px;
+        }
+
+        form.add-form input {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        form.add-form button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        form.add-form button:hover {
+            background: #1e4ed8;
+        }
+
+        /* ช่องค้นหา */
+        .search {
+            max-width: 420px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        /* รายการ Tags */
+        .tags-list {
+            width: 100%;
+            max-width: 600px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .tag-card {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            font-weight: 500;
+            color: var(--primary);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .tag-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-tags {
+            text-align: center;
+            color: #777;
+            padding: 40px 0;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="body">
+
+            <h1>รายการ Tags</h1>
+
+            <!-- ฟอร์มเพิ่ม Tag -->
+            <form id="createTagForm" action="/api/tags" method="POST" class="add-form">
+                <label for="title">ชื่อ Tag</label>
+                <input type="text" name="title" id="title" placeholder="Tag title" required>
+                <button type="submit">Create Tag</button>
+            </form>
+
+            <!-- ช่องค้นหา -->
+            <div class="search">
+                <input type="text" id="searchInput" placeholder="ค้นหา tag...">
+            </div>
+
+            <!-- รายการ Tags -->
+            <div class="tags-list" id="tagsList">
+                <% if (!tags || tags.length===0) { %>
+                    <div class="no-tags">ยังไม่มี tag</div>
+                    <% } else { %>
+                        <% tags.forEach(tag=> { %>
+                            <div class="tag-card" data-title="<%= tag.title.toLowerCase() %>">
+                                <a href="/tags/<%= tag._id %>" style="color:inherit;text-decoration:none;">
+                                    <%= tag.title %> (<%= tag.count || 0 %>)
+                                </a>
+                            </div>
+                            <% }) %>
+                                <% } %>
+            </div>
+
+            <script>
+                const searchInput = document.getElementById('searchInput');
+                const tagsList = document.getElementById('tagsList');
+
+                // ค้นหา tag แบบเรียลไทม์
+                searchInput.addEventListener('input', () => {
+                    const q = searchInput.value.toLowerCase();
+                    tagsList.querySelectorAll('.tag-card').forEach(card => {
+                        const match = card.dataset.title.includes(q);
+                        card.style.display = match ? '' : 'none';
+                    });
+                });
+            </script>
+        </div>
+</body>
+
+</html>

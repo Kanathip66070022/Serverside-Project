@@ -4,13 +4,19 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import { ensureLoggedIn } from "../middlewares/ensureMiddleware.js";
 
 import { showProfile, showImage } from "../controllers/pageController.js";
-import { showLogin, showRegister, showUpload, showCreateAlbum, showAlbum, home, editAlbumPage, editImagePage } from "../controllers/pageController.js";
+import { showLogin, showRegister, showUpload, showCreateAlbum, showAlbum, home, editAlbumPage, editImagePage, showTags, showTagAlbums } from "../controllers/pageController.js";
 
 const router = express.Router();
 
 router.get("/register", showRegister);
 router.get("/login", showLogin);
 router.get("/home", home);
+
+// add tags page
+router.get("/tags", showTags);
+// เพิ่มเส้นทางสำหรับดูอัลบั้มของ tag
+router.get("/tags/:id", showTagAlbums);
+
 router.get("/profile", authMiddleware, ensureLoggedIn, showProfile);
 router.get("/upload", authMiddleware, ensureLoggedIn, showUpload);
 router.get("/image/:id", authMiddleware, ensureLoggedIn, showImage);
