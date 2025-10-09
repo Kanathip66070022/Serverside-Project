@@ -16,8 +16,13 @@ const albumSchema = new mongoose.Schema({
     }],
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", required: true
+        ref: "User", 
+        required: true
     },
+    tags: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag"
+    }],
     status: {
         type: String,
         enum: ["public", "private"],

@@ -193,6 +193,19 @@
             <textarea id="content" name="content" placeholder="Enter content"></textarea>
           </div>
 
+          <!-- Tags -->
+          <div class="form-group">
+            <label for="tags">Tags:</label>
+            <select id="tags" name="tags[]" multiple size="5" >
+              <% tags.forEach(tag=> { %>
+                <option value="<%= tag._id %>">
+                  <%= tag.name %>
+                </option>
+                <% }) %>
+            </select>
+            <small>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+          </div>
+
           <!-- Status Toggle -->
           <div class="form-group">
             <span class="status-label">Status:</span>
@@ -211,7 +224,8 @@
           </div>
 
           <!-- result message -->
-          <div id="createAlbumMsg" aria-live="polite" style="margin-top:12px;font-weight:600;color:#2ecc71;display:none;"></div>
+          <div id="createAlbumMsg" aria-live="polite"
+            style="margin-top:12px;font-weight:600;color:#2ecc71;display:none;"></div>
         </form>
       </div>
 
@@ -233,7 +247,7 @@
           }
         });
 
-        (function(){
+        (function () {
           const form = document.querySelector('form[action="/api/albums/createAlbum"]');
           const msgEl = document.getElementById('createAlbumMsg');
           const btn = document.getElementById('createAlbumBtn');
@@ -263,7 +277,7 @@
                 // keep default status text behavior
                 document.getElementById('statusText').textContent = 'Public';
               } else {
-                const text = await res.text().catch(()=>null);
+                const text = await res.text().catch(() => null);
                 msgEl.style.color = '#e74c3c';
                 msgEl.textContent = text || 'เกิดข้อผิดพลาดในการสร้างอัลบั้ม';
                 msgEl.style.display = 'block';

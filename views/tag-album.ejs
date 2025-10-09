@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Public Albums</title>
+    <style>
+        body {
+            margin: 0;
+            background: #f5f6fa;
+        }
+
+        .body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .album-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .album-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .album-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .album-cover img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .album-info {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .album-info h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .album-info .album-title {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 0 8px;
+        }
+
+        .album-info .album-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .album-footer {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .album-footer a {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .album-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="body">
+
+            <h1><%= (tag && tag.title) ? tag.title : 'Tag' %></h1>
+
+            <div class="album-list">
+                <% albums.forEach(album=> { %>
+                    <div class="album-card">
+                        <div class="album-cover">
+                            <a href="/album/<%= album._id || album.id %>">
+                                <img src="<%= album.cover
+                                        || (album.images && album.images[0] && (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename)))
+                                        || '/images/default-cover.jpg' %>" alt="<%= album.title %>">
+                            </a>
+                        </div>
+                        <div class="album-info">
+                            <h3 class="album-title">
+                                <%= album.title %>
+                            </h3>
+                            <p class="album-content">
+                                <%= album.content || "ไม่มีรายละเอียด" %>
+                            </p>
+                            <div class="album-footer">
+                                <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
+                                <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+</body>
+
+</html>
