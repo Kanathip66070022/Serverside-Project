@@ -43,8 +43,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/albums", albumRoutes);
 app.use("/api/tags", tagRoutes);
 
-// Test Route
-app.get("/", (req, res) => {
+// Test Route (move off root so pageRoutes' '/' -> /home redirect works)
+app.get("/api-status", (req, res) => {
   res.send("Cloud Post-IT API is running 🚀");
 });
 

@@ -12,30 +12,75 @@ export const showRegister = (req, res) => {
 
 // ฟังก์ชันแสดงหน้า home
 export const home = async (req, res) => {
-    try {
-        const Album = (await import("../models/albumModel.js")).default;
-        const Image = (await import("../models/imageModel.js")).default;
+  try {
+    const Album = (await import("../models/albumModel.js")).default;
 
-        // fetch public albums and populate owner (user) and images
-        let albums = await Album.find({ status: "public" })
-            .sort({ createdAt: -1 })
-            .populate({ path: "user", select: "username" })      // <-- populate user
-            .populate({ path: "images", select: "filename imageUrl title" })
-            .lean();
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 4);
 
-        // normalize cover and owner name
-        albums = albums.map(a => {
-            const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
-            const cover = first ? (first.imageUrl || (`/uploads/${first.filename}`)) : "/images/default-cover.jpg";
-            const ownerName = (a.user && a.user.username) ? a.user.username : (a.owner || "Unknown");
-            return { ...a, cover, owner: ownerName };
-        });
+    const query = { status: "public" };
 
-        return res.render("home", { albums });
-    } catch (err) {
-        console.error("home error:", err);
-        return res.status(500).render("home", { albums: [] });
+    const total = await Album.countDocuments(query);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const safePage = Math.min(page, totalPages);
+
+    const albums = await Album.find(query)
+      .populate({ path: "images", select: "filename imageUrl" })
+      .populate({ path: "user", select: "username name" })
+      .sort({ createdAt: -1 })
+      .skip((safePage - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const normalized = albums.map(a => {
+      const cover = (a.images && a.images[0])
+        ? (a.images[0].imageUrl || `/uploads/${a.images[0].filename}`)
+        : "/images/default-cover.jpg";
+      const owner = (a.user && (a.user.name || a.user.username)) || 'Unknown';
+      return { ...a, cover, owner };
+    });
+
+    // --- My Albums pagination ---
+    let myAlbums = [];
+    let myCurrentPage = 1;
+    let myTotalPages = 1;
+    if (req.user) {
+      myCurrentPage = Math.max(1, parseInt(req.query.myPage) || 1);
+      const myLimit = 6; // items per page for "My Albums"
+      const myTotal = await Album.countDocuments({ user: req.user._id });
+      myTotalPages = Math.max(1, Math.ceil(myTotal / myLimit));
+      const mySafePage = Math.min(myCurrentPage, myTotalPages);
+
+      myAlbums = await Album.find({ user: req.user._id })
+        .populate({ path: "images", select: "filename imageUrl" })
+        .sort({ createdAt: -1 })
+        .skip((mySafePage - 1) * myLimit)
+        .limit(myLimit)
+        .lean();
+
+      myAlbums = myAlbums.map(a => {
+        const cover = (a.images && a.images[0])
+          ? (a.images[0].imageUrl || `/uploads/${a.images[0].filename}`)
+          : "/images/default-cover.jpg";
+        return { ...a, cover };
+      });
+
+      myCurrentPage = mySafePage;
     }
+
+    return res.render("home", {
+      albums: normalized,
+      currentPage: safePage,
+      totalPages,
+      user: req.user,
+      myAlbums,
+      myCurrentPage,
+      myTotalPages
+    });
+  } catch (err) {
+    console.error("home error:", err);
+    return res.status(500).render("home", { albums: [], currentPage: 1, totalPages: 1, user: req.user, myAlbums: [], myCurrentPage: 1, myTotalPages: 1 });
+  }
 };
 
 // ฟังก์ชัน render หน้า profile

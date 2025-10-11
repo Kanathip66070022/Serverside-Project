@@ -8,6 +8,9 @@ import { showLogin, showRegister, showUpload, showCreateAlbum, showAlbum, home, 
 
 const router = express.Router();
 
+// redirect root to /home
+router.get('/', (req, res) => res.redirect('/home'));
+
 router.get("/register", showRegister);
 router.get("/login", showLogin);
 router.get("/home", home);
