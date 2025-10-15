@@ -1,28 +1,33 @@
 import mongoose from "mongoose";
 
 const imageSchema = new mongoose.Schema({
-  title: { 
-    type: String, 
-    required: true },
-  content: { 
-    type: String, 
-    default: "" },
-  fileId: { 
-    type: mongoose.Schema.Types.ObjectId, required: true }, // GridFS _id
-  filename: { 
-    type: String 
+  title: {
+    type: String,
+    required: true
   },
-  contentType: { 
-    type: String 
+  content: {
+    type: String,
+    default: ""
   },
-  status: { 
-    type: String, enum: ["public", "private"], default: "public" 
+  fileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  }, // GridFS _id
+  filename: {
+    type: String
   },
-  user: { 
-    type: mongoose.Schema.Types.ObjectId, ref: "User", required: true 
+  contentType: {
+    type: String
   },
-  createdAt: { 
-    type: Date, default: Date.now 
+  status: {
+    type: String, enum: ["public", "private"], default: "public"
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", required: true
+  },
+  createdAt: {
+    type: Date, default: Date.now
   }
 });
 

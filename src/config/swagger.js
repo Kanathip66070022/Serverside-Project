@@ -1,22 +1,70 @@
-import swaggerJsdoc from "swagger-jsdoc";
+import swaggerJSDoc from "swagger-jsdoc";
 
 const options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: "3.0.3",
     info: {
       title: "Cloud Post-IT API",
       version: "1.0.0",
-      description: "API Documentation for Cloud Post-IT Web Gallery",
+      description: "API documentation for Cloud Post-IT",
     },
     servers: [
-      {
-        url: "http://localhost:5000", // แก้ให้ตรงกับ PORT ของคุณ
-      },
+      { url: "http://localhost:5000", description: "Local" },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+        cookieAuth: { type: "apiKey", in: "cookie", name: "token" },
+      },
+      schemas: {
+        User: {
+          type: "object",
+          properties: {
+            _id: { type: "string" },
+            username: { type: "string" },
+            email: { type: "string", format: "email" },
+          },
+        },
+        AuthRegisterRequest: {
+          type: "object",
+          required: ["username", "email", "password"],
+          properties: {
+            username: { type: "string" },
+            email: { type: "string", format: "email" },
+            password: { type: "string", format: "password" },
+          },
+        },
+        AuthLoginRequest: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", format: "password" },
+          },
+        },
+        AuthResponse: {
+          type: "object",
+          properties: {
+            token: { type: "string" },
+            user: { $ref: "#/components/schemas/User" },
+          },
+        },
+        Error: {
+          type: "object",
+          properties: {
+            error: { type: "string" },
+          },
+        },
+      },
+    },
+    security: [{ cookieAuth: [] }],
   },
-  apis: ["./src/routes/*.js"], // สแกนไฟล์ routes เพื่อดึง JSDoc comments
+  apis: [
+    "./src/routes/**/*.js",
+    "./src/controllers/**/*.js",
+    "./src/docs/**/*.js",
+  ],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
-
+const swaggerSpec = swaggerJSDoc(options);
 export default swaggerSpec;

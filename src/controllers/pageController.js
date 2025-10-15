@@ -2,12 +2,12 @@ import Image from "../models/imageModel.js";
 
 // ฟังก์ชัน render หน้า login และ register (ใช้โดย pageRoutes)
 export const showLogin = (req, res) => {
-    res.render("login");
+  res.render("login");
 };
 
 // ฟังก์ชัน render หน้า register
 export const showRegister = (req, res) => {
-    res.render("register");
+  res.render("register");
 };
 
 // ฟังก์ชันแสดงหน้า home
@@ -16,22 +16,20 @@ export const home = async (req, res) => {
     const Album = (await import("../models/albumModel.js")).default;
 
     const rawSort = String(req.query.sort || "latest");
-    const sort = ["latest","oldest","title","owner"].includes(rawSort) ? rawSort : "latest";
-    const sortStage =
-      sort === "oldest" ? { createdAt: 1 } :
-      sort === "title"  ? { title: 1, createdAt: -1 } :
-      sort === "owner"  ? { "user.username": 1, createdAt: -1 } :
-                          { createdAt: -1 };
+    const sort = ["latest", "oldest", "title", "owner"].includes(rawSort) ? rawSort : "latest";
+    const sortStage = sort === "oldest" ? { createdAt: 1 }
+      : sort === "title" ? { title: 1, createdAt: -1 }
+        : sort === "owner" ? { "user.username": 1, createdAt: -1 }
+          : { createdAt: -1 };
 
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.max(1, parseInt(req.query.limit) || 8);
-    const query = { status: "public" };
+    const page = Math.max(1, parseInt(req.query.page || "1", 10));
+    const limit = 4; // แสดง 4 อัลบั้มต่อหน้าเสมอ
 
-    const total = await Album.countDocuments(query);
+    const total = await Album.countDocuments({ status: "public" });
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const safePage = Math.min(page, totalPages);
 
-    const albumsRaw = await Album.find(query)
+    const albumsRaw = await Album.find({ status: "public" })
       .populate({ path: "images", select: "fileId filename imageUrl" })
       .populate({ path: "user", select: "username name" })
       .sort(sortStage)
@@ -75,12 +73,9 @@ export const home = async (req, res) => {
     }
 
     return res.render("home", {
-      albums,
-      currentPage: safePage,
-      totalPages,
-      user: req.user,
-      myAlbums,
-      sort
+      albums, myAlbums, user: req.user,
+      currentPage: safePage, totalPages, sort,
+      perPage: limit
     });
   } catch (err) {
     console.error("home error:", err);
@@ -90,7 +85,8 @@ export const home = async (req, res) => {
       totalPages: 1,
       user: req.user,
       myAlbums: [],
-      sort: "latest"
+      sort: "latest",
+      perPage: 4
     });
   }
 };
@@ -166,26 +162,26 @@ export const showProfile = async (req, res) => {
 
 // ฟังก์ชันแสดงหน้าอัพโหลด
 export const showUpload = (req, res) => {
-    res.render("upload", { error: null, success: null });
+  res.render("upload", { error: null, success: null });
 };
 
 // ฟังก์ชันแสดงหน้ารายละเอียดรูปภาพ
 export const showImage = async (req, res) => {
-    try {
-        const id = req.params.id;
-        if (!id) return res.status(400).send("Missing id");
+  try {
+    const id = req.params.id;
+    if (!id) return res.status(400).send("Missing id");
 
-        const image = await Image.findById(id)
-            .populate("user", "username profilePic")
-            .lean();
+    const image = await Image.findById(id)
+      .populate("user", "username profilePic")
+      .lean();
 
-        if (!image) return res.status(404).send("Image not found");
+    if (!image) return res.status(404).send("Image not found");
 
-        return res.render("image", { image, currentUser: req.user || null });
-    } catch (err) {
-        console.error("showImage error:", err);
-        return res.status(500).send("Server error");
-    }
+    return res.render("image", { image, currentUser: req.user || null });
+  } catch (err) {
+    console.error("showImage error:", err);
+    return res.status(500).send("Server error");
+  }
 };
 
 // ฟังก์ชันแสดงหน้าสร้างอัลบั้ม

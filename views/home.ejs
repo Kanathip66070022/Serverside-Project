@@ -215,8 +215,8 @@
                             >📜 Oldest</option>
                         <option value="title" <%=(typeof sort !=='undefined' && sort==='title' ) ? 'selected' : '' %>>🔤
                             Title (A–Z)</option>
-                        <option value="owner" <%=(typeof sort !=='undefined' && sort==='owner' ) ? 'selected' : '' %>>👤
-                            Owner</option>
+                        <!-- <option value="owner" <%=(typeof sort !=='undefined' && sort==='owner' ) ? 'selected' : '' %>>👤
+                            Owner</option> -->
                     </select>
                 </form>
             </div>
@@ -236,8 +236,12 @@
                             <p class="album-content">
                                 <%= album.content || "No details" %>
                             </p>
-                            <div class="album-footer">
+                            <br>
+                            <p class="album-content">
                                 <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
+                            </p>
+                            <div class="album-footer">
+                                <span>📅 <%= new Date(album.createdAt).toLocaleDateString() %></span>
                                 <a href="/album/<%= album._id || album.id %>">View Album →</a>
                             </div>
                         </div>
@@ -247,15 +251,16 @@
 
             <!-- ✅ Pagination -->
             <div class="pagination">
-                <% if (currentPage> 1) { %>
-                    <a href="/home?page=<%= currentPage - 1 %>">⬅</a>
-                    <% } %>
+                <% var qSort = (typeof sort !== 'undefined' && sort) ? '&sort=' + encodeURIComponent(sort) : ''; %>
+                <% if (currentPage > 1) { %>
+                    <a href="/home?page=<%= currentPage - 1 %><%= qSort %>">⬅</a>
+                <% } %>
 
-                        <span>Page <%= currentPage %> / <%= totalPages %></span>
+                <span>Page <%= currentPage %> / <%= totalPages %></span>
 
-                        <% if (currentPage < totalPages) { %>
-                            <a href="/home?page=<%= currentPage + 1 %>">➡</a>
-                            <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <a href="/home?page=<%= currentPage + 1 %><%= qSort %>">➡</a>
+                <% } %>
             </div>
 
             <hr style="margin: 50px auto; width: 60%; border: 1px solid #ddd;">

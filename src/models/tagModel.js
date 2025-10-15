@@ -15,4 +15,5 @@ tagSchema.statics.countTags = function () {
 };
 
 const Tag = mongoose.model("Tag", tagSchema);
+
 export default Tag;

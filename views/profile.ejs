@@ -277,8 +277,7 @@
                                    ? (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename))
                                    : (album.cover
                                         ? (album.cover.startsWith('/') ? album.cover : '/uploads/' + album.cover)
-                                        : '/images/default-cover.jpg')) %>"
-                     alt="<%= album.title || 'Album' %>">
+                                        : '/images/default-cover.jpg')) %>" alt="<%= album.title || 'Album' %>">
                 <p class="card-title">
                   <%= album.title %>
                 </p>

@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Tag - <%= (tag && tag.title) ? tag.title : 'Tag' %></title>
+    <title>Tag - <%= (tag && tag.title) ? tag.title : 'Tag' %>
+    </title>
     <style>
         body {
             margin: 0;
@@ -113,7 +114,9 @@
 
         <div class="body">
 
-            <h1><%= (tag && tag.title) ? tag.title : 'Tag' %></h1>
+            <h1>
+                <%= (tag && tag.title) ? tag.title : 'Tag' %>
+            </h1>
 
             <div class="album-list">
                 <% albums.forEach(album=> { %>
@@ -132,8 +135,12 @@
                             <p class="album-content">
                                 <%= album.content || "No details" %>
                             </p>
-                            <div class="album-footer">
+                            <br>
+                            <p class="album-content">
                                 <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
+                            </p>
+                            <div class="album-footer">
+                                <span>📅 <%= new Date(album.createdAt).toLocaleDateString() %></span>
                                 <a href="/album/<%= album._id || album.id %>">View Album →</a>
                             </div>
                         </div>

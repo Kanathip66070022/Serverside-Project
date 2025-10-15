@@ -57,17 +57,17 @@ export const uploadImage = async (req, res) => {
 
 // ฟังก์ชันดึงรูปทั้งหมด (รวม populate user)
 export const getImages = async (req, res) => {
-    try {
-        const images = await Image.find()
-            .sort({ createdAt: -1 })
-            .populate("user", "username email profilePic")
-            .lean();
+  try {
+    const images = await Image.find()
+      .sort({ createdAt: -1 })
+      .populate("user", "username email profilePic")
+      .lean();
 
-        return res.render("gallery", { images });
-    } catch (err) {
-        console.error("getImages error:", err);
-        return res.status(500).send("Failed to load gallery");
-    }
+    return res.render("gallery", { images });
+  } catch (err) {
+    console.error("getImages error:", err);
+    return res.status(500).send("Failed to load gallery");
+  }
 };
 
 // DELETE image API
@@ -141,7 +141,7 @@ export const editImage = async (req, res) => {
       // remove old file
       if (image.filename) {
         const oldPath = path.join(process.cwd(), "uploads", image.filename);
-        await fs.promises.unlink(oldPath).catch(()=>null);
+        await fs.promises.unlink(oldPath).catch(() => null);
       }
       // update image doc
       image.filename = req.file.filename;
