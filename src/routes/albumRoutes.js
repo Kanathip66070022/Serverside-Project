@@ -3,7 +3,7 @@ import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { ensureLoggedIn } from "../middlewares/ensureMiddleware.js";
 
-import upload from "../config/multer.js";
+import upload from "../config/multerUploads.js";
 import { createAlbum, searchAlbums, deleteAlbum, updateAlbum, addImageToAlbum, removeImageFromAlbum, addTagsToAlbum, removeTagFromAlbum } from "../controllers/postController.js";
 
 const router = express.Router();

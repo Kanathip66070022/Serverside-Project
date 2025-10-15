@@ -134,6 +134,65 @@
             color: #2c3e50;
             font-size: 16px;
         }
+
+        /* ✅ หัวข้อ + Sort Bar */
+        .album-header {
+            display: flex;
+            justify-content: space-between;
+            /* H1 ซ้าย / Sort Form ขวา */
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 25px auto;
+            padding: 0 15px;
+        }
+
+        /* ✅ Sort form อยู่ขวาสุด */
+        .sort-container {
+            display: flex;
+            justify-content: flex-end;
+            /* ชิดขวา */
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+        }
+
+        /* ✅ Form Style */
+        .sort-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            font-family: Arial, sans-serif;
+        }
+
+        .sort-form label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .sort-form select {
+            padding: 7px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sort-form select:hover {
+            border-color: #3498db;
+            box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
+        }
+
+        .sort-form select:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 6px rgba(41, 128, 185, 0.4);
+        }
     </style>
 
 </head>
@@ -146,20 +205,28 @@
 
             <h1>🌍 Public Albums</h1>
 
+            <div class="sort-container">
+                <form method="GET" action="/home" class="sort-form">
+                    <label for="sort">Sort by:</label>
+                    <select name="sort" id="sort" onchange="this.form.submit()">
+                        <option value="latest" <%=(typeof sort !=='undefined' && sort==='latest' ) ? 'selected' : '' %>
+                            >🕒 Latest</option>
+                        <option value="oldest" <%=(typeof sort !=='undefined' && sort==='oldest' ) ? 'selected' : '' %>
+                            >📜 Oldest</option>
+                        <option value="title" <%=(typeof sort !=='undefined' && sort==='title' ) ? 'selected' : '' %>>🔤
+                            Title (A–Z)</option>
+                        <option value="owner" <%=(typeof sort !=='undefined' && sort==='owner' ) ? 'selected' : '' %>>👤
+                            Owner</option>
+                    </select>
+                </form>
+            </div>
+
             <div class="album-list">
                 <% albums.forEach(album=> { %>
                     <div class="album-card">
                         <div class="album-cover">
                             <a href="/album/<%= album._id || album.id %>">
-                                <% 
-                                  const pubImg0 = album.images && album.images[0];
-                                  const pubCover = album.cover
-                                    || (pubImg0 && (pubImg0.fileId
-                                          ? ('/files/' + pubImg0.fileId)
-                                          : (pubImg0.imageUrl || ('/uploads/' + pubImg0.filename))))
-                                    || '/images/default-cover.jpg';
-                                %>
-                                <img src="<%= pubCover %>" alt="<%= album.title %>">
+                                <img src="<%= album.cover || '/images/default-cover.jpg' %>" alt="<%= album.title %>">
                             </a>
                         </div>
                         <div class="album-info">
@@ -204,15 +271,8 @@
                         <div class="album-card">
                             <div class="album-cover">
                                 <a href="/album/<%= album._id || album.id %>">
-                                    <%
-                                      const myImg0 = album.images && album.images[0];
-                                      const myCover = album.cover
-                                        || (myImg0 && (myImg0.fileId
-                                              ? ('/files/' + myImg0.fileId)
-                                              : (myImg0.imageUrl || ('/uploads/' + myImg0.filename))))
-                                        || '/images/default-cover.jpg';
-                                    %>
-                                    <img src="<%= myCover %>" alt="<%= album.title %>">
+                                    <img src="<%= album.cover || '/images/default-cover.jpg' %>"
+                                        alt="<%= album.title %>">
                                 </a>
                             </div>
                             <div class="album-info">

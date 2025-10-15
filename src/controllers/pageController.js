@@ -15,9 +15,16 @@ export const home = async (req, res) => {
   try {
     const Album = (await import("../models/albumModel.js")).default;
 
+    const rawSort = String(req.query.sort || "latest");
+    const sort = ["latest","oldest","title","owner"].includes(rawSort) ? rawSort : "latest";
+    const sortStage =
+      sort === "oldest" ? { createdAt: 1 } :
+      sort === "title"  ? { title: 1, createdAt: -1 } :
+      sort === "owner"  ? { "user.username": 1, createdAt: -1 } :
+                          { createdAt: -1 };
+
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.max(1, parseInt(req.query.limit) || 8);
-
     const query = { status: "public" };
 
     const total = await Album.countDocuments(query);
@@ -25,9 +32,9 @@ export const home = async (req, res) => {
     const safePage = Math.min(page, totalPages);
 
     const albumsRaw = await Album.find(query)
-      .populate({ path: "images", select: "fileId filename imageUrl" })  // << ensure fileId
+      .populate({ path: "images", select: "fileId filename imageUrl" })
       .populate({ path: "user", select: "username name" })
-      .sort({ createdAt: -1 })
+      .sort(sortStage)
       .skip((safePage - 1) * limit)
       .limit(limit)
       .lean();
@@ -35,21 +42,16 @@ export const home = async (req, res) => {
     const albums = albumsRaw.map(a => {
       let cover = "/images/default-cover.jpg";
       if (a.images && a.images[0]) {
-        const img0 = a.images[0];
-        if (img0.fileId) cover = `/files/${img0.fileId}`;
-        else if (img0.imageUrl) cover = img0.imageUrl;
-        else if (img0.filename) cover = `/uploads/${img0.filename}`;
-      } else if (a.cover && typeof a.cover === "string") {
-        cover = a.cover.startsWith("/") ? a.cover : `/uploads/${a.cover}`;
+        const i0 = a.images[0];
+        if (i0.fileId) cover = `/files/${i0.fileId}`;
+        else if (i0.imageUrl) cover = i0.imageUrl;
+        else if (i0.filename) cover = `/uploads/${encodeURIComponent(i0.filename)}`;
+      } else if (a.cover) {
+        cover = a.cover.startsWith("/") ? a.cover : `/uploads/${encodeURIComponent(a.cover)}`;
       }
-      return {
-        ...a,
-        cover,
-        owner: (a.user && (a.user.name || a.user.username)) || "Unknown"
-      };
+      return { ...a, cover, owner: (a.user && (a.user.name || a.user.username)) || "Unknown" };
     });
 
-    // My albums
     let myAlbums = [];
     if (req.user) {
       myAlbums = await Album.find({ user: req.user._id })
@@ -61,24 +63,24 @@ export const home = async (req, res) => {
       myAlbums = myAlbums.map(a => {
         let cover = "/images/default-cover.jpg";
         if (a.images && a.images[0]) {
-          const img0 = a.images[0];
-            if (img0.fileId) cover = `/files/${img0.fileId}`;
-            else if (img0.imageUrl) cover = img0.imageUrl;
-            else if (img0.filename) cover = `/uploads/${img0.filename}`;
-        } else if (a.cover && typeof a.cover === "string") {
-          cover = a.cover.startsWith("/") ? a.cover : `/uploads/${a.cover}`;
+          const i0 = a.images[0];
+          if (i0.fileId) cover = `/files/${i0.fileId}`;
+          else if (i0.imageUrl) cover = i0.imageUrl;
+          else if (i0.filename) cover = `/uploads/${encodeURIComponent(i0.filename)}`;
+        } else if (a.cover) {
+          cover = a.cover.startsWith("/") ? a.cover : `/uploads/${encodeURIComponent(a.cover)}`;
         }
         return { ...a, cover };
       });
     }
 
-    // DEBUG (ลบภายหลัง): console.log(albums[0]?.images?.[0]);
     return res.render("home", {
       albums,
       currentPage: safePage,
       totalPages,
       user: req.user,
-      myAlbums
+      myAlbums,
+      sort
     });
   } catch (err) {
     console.error("home error:", err);
@@ -87,7 +89,8 @@ export const home = async (req, res) => {
       currentPage: 1,
       totalPages: 1,
       user: req.user,
-      myAlbums: []
+      myAlbums: [],
+      sort: "latest"
     });
   }
 };
