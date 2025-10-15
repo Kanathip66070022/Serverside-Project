@@ -1,3 +1,4 @@
+// controllers/postController.js
 export const createAlbum = async (req, res) => {
   try {
     const Album = (await import("../models/albumModel.js")).default;
@@ -48,49 +49,79 @@ export const createAlbum = async (req, res) => {
   }
 };
 
+// ค้นหาอัลบั้มสาธารณะตามคำค้นหา
 export const searchAlbums = async (req, res) => {
   try {
-    const q = (req.query.q || "").trim();
+    const q = String((req.query.q || "")).trim();
     if (!q) return res.redirect("/home");
 
     const Album = (await import("../models/albumModel.js")).default;
-    let albums = await Album.find({
-      title: { $regex: q, $options: "i" },
-      status: "public"
-    })
+
+    // pagination: หน้าและจำนวนต่อหน้า (ยึด 4 ตามที่กำหนด)
+    const page = Math.max(1, parseInt(req.query.page || "1", 10));
+    const limit = 4;
+
+    // เงื่อนไขค้นหา: title หรือ content และต้องเป็นสาธารณะ
+    const filter = {
+      status: "public",
+      $or: [
+        { title: { $regex: q, $options: "i" } },
+        { content: { $regex: q, $options: "i" } }
+      ]
+    };
+
+    const total = await Album.countDocuments(filter);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const safePage = Math.min(page, totalPages);
+
+    let albums = await Album.find(filter)
+      .populate({ path: "user", select: "username name" })
+      .populate({ path: "images", select: "fileId imageUrl filename" })
       .sort({ createdAt: -1 })
-      .limit(50)
-      .populate({ path: "user", select: "username name" }) // <-- populate owner
-      .populate({ path: "images", select: "imageUrl originalname filename" })
+      .skip((safePage - 1) * limit)
+      .limit(limit)
       .lean();
 
-    // ใส่ cover fallback และ owner ให้ view ใช้ง่ายขึ้น
+    // เตรียม cover ให้พร้อมใช้ใน view (รองรับ GridFS fileId)
     albums = albums.map(a => {
       const first = Array.isArray(a.images) && a.images.length ? a.images[0] : null;
-      const cover = first ? (first.imageUrl || `/uploads/${first.filename}`) : "/images/default-cover.jpg";
-      const owner = (a.user && (a.user.name || a.user.username)) || a.owner || "Unknown";
+      let cover = "/images/default-cover.jpg";
+      if (first) {
+        if (first.fileId) cover = `/files/${first.fileId}`;
+        else if (first.imageUrl) cover = first.imageUrl;
+        else if (first.filename) cover = `/uploads/${encodeURIComponent(first.filename)}`;
+      }
+      const owner = (a.user && (a.user.name || a.user.username)) || "Unknown";
       return { ...a, cover, owner };
     });
 
     return res.render("home", {
-      user: req.user || null,
-      posts: [],
       albums,
-      error: null,
+      user: req.user || null,
+      myAlbums: [],               // ซ่อนส่วน "อัลบั้มของตัวเอง" ตอนค้นหา
+      currentPage: safePage,
+      totalPages,
+      sort: "latest",
+      isSearch: true,
       searchQuery: q
     });
   } catch (err) {
     console.error("searchAlbums error:", err);
-    return res.render("home", {
+    return res.status(500).render("home", {
       user: req.user || null,
-      posts: [],
       albums: [],
-      error: "Search failed, try again",
-      searchQuery: req.query.q || ""
+      myAlbums: [],
+      currentPage: 1,
+      totalPages: 1,
+      sort: "latest",
+      isSearch: true,
+      searchQuery: req.query.q || "",
+      error: "Search failed, try again"
     });
   }
 };
 
+// ลบอัลบั้มและรูปทั้งหมดในอัลบั้ม
 export const deleteAlbum = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });
@@ -147,6 +178,7 @@ export const deleteAlbum = async (req, res) => {
   }
 };
 
+// เพิ่มรูปลงอัลบั้ม (upload หรือเลือกจากที่มี)
 export const addImageToAlbum = async (req, res) => {
   try {
     const albumId = req.params.id;
@@ -209,6 +241,7 @@ export const addImageToAlbum = async (req, res) => {
   }
 };
 
+// เอารูปออกจากอัลบั้ม (แต่ไม่ลบไฟล์/เอกสาร)
 export const removeImageFromAlbum = async (req, res) => {
   try {
     const albumId = req.params.id;
@@ -238,6 +271,7 @@ export const removeImageFromAlbum = async (req, res) => {
   }
 };
 
+// แก้ไขข้อมูลอัลบั้ม (title, content, status)
 export const updateAlbum = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });
@@ -263,6 +297,7 @@ export const updateAlbum = async (req, res) => {
   }
 };
 
+// เพิ่มแท็กลงในอัลบั้ม
 export const addTagsToAlbum = async (req, res) => {
   try {
     const albumId = req.params.id;
@@ -306,6 +341,7 @@ export const addTagsToAlbum = async (req, res) => {
   }
 };
 
+// ลบแท็กออกจากอัลบั้ม
 export const removeTagFromAlbum = async (req, res) => {
   try {
     const albumId = req.params.id;

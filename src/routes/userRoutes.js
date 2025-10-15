@@ -9,7 +9,10 @@ import { registerUser, loginUser, logoutUser, updateProfile, deleteProfile } fro
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
+// POST route สำหรับการลงทะเบียนและเข้าสู่ระบบ
 router.post("/register", registerUser);
+
+// POST route สำหรับการเข้าสู่ระบบ
 router.post("/login", loginUser);
 
 // PATCH route สำหรับอัปเดตโปรไฟล์ผู้ใช้ (เช่น ชื่อ, รูปโปรไฟล์)
@@ -25,6 +28,7 @@ router.get("/logout", authMiddleware, logoutUser);
 router.post("/logout", authMiddleware, logoutUser);
 
 export default router;
+
 /**
  * @openapi
  * /api/users/register:
@@ -53,6 +57,7 @@ export default router;
  *           application/json:
  *             schema: { $ref: '#/components/schemas/Error' }
  */
+
 /**
  * @openapi
  * /api/users/login:

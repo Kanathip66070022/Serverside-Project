@@ -226,20 +226,22 @@
               <a href="javascript:history.back()" class="back-btn">← Back</a>
 
               <!-- ปุ่มดาวน์โหลด (ทุกคนเห็นได้) -->
-              <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>"
-                download="<%= image.title || 'download' %>" class="download-btn">⬇ Download</a>
+              <% const downloadUrl=image.fileId ? ('/files/' + image.fileId + '?download=1' ) : (image.imageUrl ||
+                (image.filename ? ('/uploads/' + encodeURIComponent(image.filename)) : '' )); %>
+                <a href="<%= downloadUrl %>" download="<%= image.title || image.filename || 'download' %>"
+                  class="download-btn">⬇ Download</a>
 
-              <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
-              <% if (isOwner) { %>
-                <!-- ไปยังหน้าแก้ไขที่แยกเป็นหน้าใหม่ -->
-                <a href="/image/<%= image._id %>/edit" class="edit-btn">✎ Edit</a>
+                <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
+                <% if (isOwner) { %>
+                  <!-- ไปยังหน้าแก้ไขที่แยกเป็นหน้าใหม่ -->
+                  <a href="/image/<%= image._id %>/edit" class="edit-btn">✎ Edit</a>
 
-                <!-- ลบโดยใช้ form + method-override เป็น fallback -->
-                <form action="/api/upload/images/<%= image._id %>?_method=DELETE" method="POST" style="display:inline;"
-                  onsubmit="return confirm('Are you sure you want to delete this image?');">
-                  <button type="submit" class="delete-btn">🗑 Delete</button>
-                </form>
-                <% } %>
+                  <!-- ลบโดยใช้ form + method-override เป็น fallback -->
+                  <form action="/api/upload/images/<%= image._id %>?_method=DELETE" method="POST"
+                    style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this image?');">
+                    <button type="submit" class="delete-btn">🗑 Delete</button>
+                  </form>
+                  <% } %>
             </div>
 
       </div>

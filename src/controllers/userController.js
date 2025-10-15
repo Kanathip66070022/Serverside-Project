@@ -47,7 +47,7 @@ export const loginUser = async (req, res) => {
       if (req.headers.accept && req.headers.accept.includes("application/json")) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      return res.status(401).render("login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+      return res.status(401).render("login", { error: "Invalid credentials" });
     }
 
     const bcrypt = (await import("bcrypt")).default;
@@ -56,7 +56,7 @@ export const loginUser = async (req, res) => {
       if (req.headers.accept && req.headers.accept.includes("application/json")) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      return res.status(401).render("login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+      return res.status(401).render("login", { error: "Invalid credentials" });
     }
 
     // สร้าง token / เซ็ต cookie ตามเดิม
@@ -69,7 +69,7 @@ export const loginUser = async (req, res) => {
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
       return res.status(500).json({ error: "Server error" });
     }
-    return res.status(500).render("login", { error: "เกิดข้อผิดพลาด ลองอีกครั้ง" });
+    return res.status(500).render("login", { error: "Server error" });
   }
 };
 
@@ -145,6 +145,7 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+// เพิ่ม handler สำหรับ POST /profile/delete
 export const deleteProfile = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });

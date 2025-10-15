@@ -229,9 +229,14 @@ const router = express.Router();
  *         description: อัปโหลดสำเร็จ
  */
 
-router.get("/gallery", getImages);               // GET  /api/upload/gallery
-router.post("/", authMiddleware, upload.single("image"), uploadImage); // POST /api/upload
-router.delete("/images/:id", authMiddleware, ensureLoggedIn, deleteImage); // DELETE /api/upload/images/:id
+// Public gallery (no auth)
+router.get("/gallery", getImages);
+
+// DELETE image by id
+router.post("/", authMiddleware, upload.single("image"), uploadImage);
+
+// optional alias singular
+router.delete("/images/:id", authMiddleware, ensureLoggedIn, deleteImage);
 
 // PATCH update image metadata / replace file
 router.patch("/images/:id", authMiddleware, ensureLoggedIn, upload.single("image"), editImage);

@@ -24,6 +24,7 @@ const router = express.Router();
  *                   _id: { type: string }
  *                   title: { type: string }
  */
+// GET all tags
 router.get("/", listTags);
 
 /**
@@ -42,6 +43,7 @@ router.get("/", listTags);
  *               properties:
  *                 total: { type: integer }
  */
+// GET tag count (for stats)
 router.get("/count", getTagCount);
 
 /**
@@ -75,6 +77,7 @@ router.get("/count", getTagCount);
  *       401:
  *         description: Unauthorized
  */
+// Create a new tag
 router.post("/", authMiddleware, ensureLoggedIn, createTag);
 
 /**
@@ -105,6 +108,7 @@ router.post("/", authMiddleware, ensureLoggedIn, createTag);
  *       404:
  *         description: Not found
  */
+// Delete a tag by id
 router.delete("/:id", authMiddleware, ensureLoggedIn, deleteTag);
 
 export default router;

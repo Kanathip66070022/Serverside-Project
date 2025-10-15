@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
+// Middleware ตรวจสอบ JWT จาก Header หรือ Cookie
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;

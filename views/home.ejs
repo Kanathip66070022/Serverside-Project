@@ -251,54 +251,59 @@
 
             <!-- ✅ Pagination -->
             <div class="pagination">
-                <% var qSort = (typeof sort !== 'undefined' && sort) ? '&sort=' + encodeURIComponent(sort) : ''; %>
-                <% if (currentPage > 1) { %>
-                    <a href="/home?page=<%= currentPage - 1 %><%= qSort %>">⬅</a>
-                <% } %>
-
-                <span>Page <%= currentPage %> / <%= totalPages %></span>
-
-                <% if (currentPage < totalPages) { %>
-                    <a href="/home?page=<%= currentPage + 1 %><%= qSort %>">➡</a>
-                <% } %>
+                <% var cp=(typeof currentPage !=='undefined' && currentPage) ? currentPage : 1; %>
+                    <% var tp=(typeof totalPages !=='undefined' && totalPages) ? totalPages : 1; %>
+                        <% var qSort=(typeof sort !=='undefined' && sort) ? '&sort=' + encodeURIComponent(sort) : '' ;
+                            %>
+                            <% if (cp> 1) { %>
+                                <a href="/home?page=<%= cp - 1 %><%= qSort %>">⬅</a>
+                                <% } %>
+                                    <span>Page <%= cp %> / <%= tp %></span>
+                                    <% if (cp < tp) { %>
+                                        <a href="/home?page=<%= cp + 1 %><%= qSort %>">➡</a>
+                                        <% } %>
             </div>
 
             <hr style="margin: 50px auto; width: 60%; border: 1px solid #ddd;">
 
             <!-- ✅ ส่วนแสดงอัลบั้มของตัวเอง -->
-            <% if (user && myAlbums && myAlbums.length> 0) { %>
-                <h1 style="text-align:center; margin-top: 60px; color: #2c3e50;">
-                    📁 <%= (user && (user.name || user.username)) ? (user.name || user.username) + ' Albums'
-                        : 'My Albums' %>
-                </h1>
-                <div class="album-list">
-                    <% myAlbums.forEach(album=> { %>
-                        <div class="album-card">
-                            <div class="album-cover">
-                                <a href="/album/<%= album._id || album.id %>">
-                                    <img src="<%= album.cover || '/images/default-cover.jpg' %>"
-                                        alt="<%= album.title %>">
-                                </a>
+            <% const isSearchMode=(typeof isSearch !=='undefined' ) ? isSearch : false; %>
+                <% const myAlbumsSafe=(typeof myAlbums !=='undefined' && Array.isArray(myAlbums)) ? myAlbums : []; %>
+                    <% if (!isSearchMode) { %>
+                        <% if (user && myAlbumsSafe.length> 0) { %>
+                            <h1 style="text-align:center; margin-top: 60px; color: #2c3e50;">
+                                📁 <%= (user && (user.name || user.username)) ? (user.name || user.username) + ' Albums'
+                                    : 'My Albums' %>
+                            </h1>
+                            <div class="album-list">
+                                <% myAlbumsSafe.forEach(album=> { %>
+                                    <div class="album-card">
+                                        <div class="album-cover">
+                                            <a href="/album/<%= album._id || album.id %>">
+                                                <img src="<%= album.cover || '/images/default-cover.jpg' %>"
+                                                    alt="<%= album.title %>">
+                                            </a>
+                                        </div>
+                                        <div class="album-info">
+                                            <h3 class="album-title">
+                                                <%= album.title %>
+                                            </h3>
+                                            <p class="album-content">
+                                                <%= album.content || "No details" %>
+                                            </p>
+                                            <div class="album-footer">
+                                                <span>📅 <%= new Date(album.createdAt).toLocaleDateString() %></span>
+                                                <a href="/album/<%= album._id || album.id %>">View Album →</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
                             </div>
-                            <div class="album-info">
-                                <h3 class="album-title">
-                                    <%= album.title %>
-                                </h3>
-                                <p class="album-content">
-                                    <%= album.content || "No details" %>
-                                </p>
-                                <div class="album-footer">
-                                    <span>📅 <%= new Date(album.createdAt).toLocaleDateString() %></span>
-                                    <a href="/album/<%= album._id || album.id %>">View Album →</a>
-                                </div>
-                            </div>
-                        </div>
-                        <% }) %>
-
-                </div>
-                <% } else if (user) { %>
-                    <p style="text-align:center; color:#888; margin-top:50px;">You don't have your own album yet. 😅</p>
-                    <% } %>
+                            <% } else if (user) { %>
+                                <p style="text-align:center; color:#888; margin-top:50px;">You don't have your own album
+                                    yet. 😅</p>
+                                <% } %>
+                                    <% } %>
 
         </div>
 
