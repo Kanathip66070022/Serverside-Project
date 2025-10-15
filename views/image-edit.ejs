@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Edit Image</title>
@@ -17,7 +18,7 @@
       padding: 24px 28px;
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
@@ -109,40 +110,40 @@
     }
   </style>
 </head>
+
 <body>
   <%- include('partials/header') %>
-  <main class="container">
-    <h1>Edit Image</h1>
+    <main class="container">
+      <h1>Edit Image</h1>
 
-    <form action="/api/upload/images/<%= image._id %>?_method=PATCH" method="POST" enctype="multipart/form-data">
-      <label>Preview</label>
-      <div class="row">
-        <img class="thumb"
-             src="<%= image.fileId
+      <form action="/api/upload/images/<%= image._id %>?_method=PATCH" method="POST" enctype="multipart/form-data">
+        <label>Preview</label>
+        <div class="row">
+          <img class="thumb" src="<%= image.fileId
                     ? ('/files/' + image.fileId)
                     : (image.imageUrl
                         ? image.imageUrl
                         : (image.filename
                             ? '/uploads/' + encodeURIComponent(image.filename)
-                            : '/images/default-cover.jpg')) %>"
-             alt="thumb"
-             onerror="this.src='/images/default-cover.jpg'">
-      </div>
+                            : '/images/default-cover.jpg')) %>" alt="thumb"
+            onerror="this.src='/images/default-cover.jpg'">
+        </div>
 
-      <label>Title</label>
-      <input name="title" value="<%= image.title %>" />
+        <label>Title</label>
+        <input name="title" value="<%= image.title %>" />
 
-      <label>Content</label>
-      <textarea name="content" rows="5"><%= image.content %></textarea>
+        <label>Content</label>
+        <textarea name="content" rows="5"><%= image.content %></textarea>
 
-      <label>Replace file (optional)</label>
-      <input type="file" name="image" accept="image/*" />
+        <label>Replace file (optional)</label>
+        <input type="file" name="image" accept="image/*" />
 
-      <div class="actions">
-        <button type="submit">💾 Save</button>
-        <a href="/image/<%= image._id %>" class="btn-cancel">Cancel</a>
-      </div>
-    </form>
-  </main>
+        <div class="actions">
+          <button type="submit">💾 Save</button>
+          <a href="/image/<%= image._id %>" class="btn-cancel">Cancel</a>
+        </div>
+      </form>
+    </main>
 </body>
+
 </html>

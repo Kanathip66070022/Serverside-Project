@@ -186,55 +186,61 @@
 
     <div class="body">
       <div class="container">
-        <!-- รูปภาพใหญ่ -->
-        <div class="photo-wrapper">
-          <% if (image && (image.fileId || image.imageUrl)) { %>
-            <% const src=image.fileId ? ('/files/' + image.fileId) : (image.imageUrl || ('/uploads/' + image.filename));
-              %>
-              <img src="<%= src %>" alt="<%= image.title || 'image' %>">
-              <% } else { %>
-                <p style="color:#999;text-align:center;">Image file not found</p>
-                <% } %>
-        </div>
-
-        <!-- ข้อมูลรูป -->
-        <h2>
-          <%= image.title || 'Untitled' %>
-        </h2>
-        <div class="meta">
-          <p><strong>Content:</strong>
-            <%= image.content || "No details" %>
-          </p>
-          <p><strong>By:</strong>
-            <%= image.user?.username || 'Unknown' %>
-          </p>
-        </div>
-
-        <!-- ปุ่ม Action -->
-        <% const currentUserId=(typeof user !=='undefined' && user) ? String(user._id || user.id || '' ) : '' ; const
-          imageOwnerId=image && image.user ? String(image.user._id || image.user) : '' ; const isOwner=currentUserId &&
-          imageOwnerId && currentUserId===imageOwnerId; %>
-
-          <div class="actions">
-            <!-- ปุ่มกลับ -->
-            <a href="javascript:history.back()" class="back-btn">← Back</a>
-
-            <!-- ปุ่มดาวน์โหลด (ทุกคนเห็นได้) -->
-            <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>"
-              download="<%= image.title || 'download' %>" class="download-btn">⬇ Download</a>
-
-            <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
-            <% if (isOwner) { %>
-              <!-- ไปยังหน้าแก้ไขที่แยกเป็นหน้าใหม่ -->
-              <a href="/image/<%= image._id %>/edit" class="edit-btn">✎ Edit</a>
-
-              <!-- ลบโดยใช้ form + method-override เป็น fallback -->
-              <form action="/api/upload/images/<%= image._id %>?_method=DELETE" method="POST" style="display:inline;"
-                onsubmit="return confirm('Are you sure you want to delete this image?');">
-                <button type="submit" class="delete-btn">🗑 Delete</button>
-              </form>
-              <% } %>
+        <% function fmtDate(d){ try { return d ? new
+          Date(d).toLocaleString('en-US',{year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+          : '-' ; } catch(e){ return String(d||'-'); } } %>
+          <!-- รูปภาพใหญ่ -->
+          <div class="photo-wrapper">
+            <% if (image && (image.fileId || image.imageUrl)) { %>
+              <% const src=image.fileId ? ('/files/' + image.fileId) : (image.imageUrl || ('/uploads/' +
+                image.filename)); %>
+                <img src="<%= src %>" alt="<%= image.title || 'image' %>">
+                <% } else { %>
+                  <p style="color:#999;text-align:center;">Image file not found</p>
+                  <% } %>
           </div>
+
+          <!-- ข้อมูลรูป -->
+          <h2>
+            <%= image.title || 'Untitled' %>
+          </h2>
+          <div class="meta">
+            <p><strong>Content:</strong>
+              <%= image.content || "No details" %>
+            </p>
+            <p><strong>By:</strong>
+              <%= (image.user && (image.user.username || image.user.name)) || 'Unknown' %>
+            </p>
+            <p><strong>Uploaded:</strong>
+              <%= fmtDate(image.createdAt) %>
+            </p>
+          </div>
+
+          <!-- ปุ่ม Action -->
+          <% const currentUserId=(typeof user !=='undefined' && user) ? String(user._id || user.id || '' ) : '' ; const
+            imageOwnerId=image && image.user ? String(image.user._id || image.user) : '' ; const isOwner=currentUserId
+            && imageOwnerId && currentUserId===imageOwnerId; %>
+
+            <div class="actions">
+              <!-- ปุ่มกลับ -->
+              <a href="javascript:history.back()" class="back-btn">← Back</a>
+
+              <!-- ปุ่มดาวน์โหลด (ทุกคนเห็นได้) -->
+              <a href="<%= image.imageUrl || ('/uploads/' + image.filename) %>"
+                download="<%= image.title || 'download' %>" class="download-btn">⬇ Download</a>
+
+              <!-- แสดงเฉพาะเจ้าของจึงเห็นปุ่มแก้ไข/ลบ -->
+              <% if (isOwner) { %>
+                <!-- ไปยังหน้าแก้ไขที่แยกเป็นหน้าใหม่ -->
+                <a href="/image/<%= image._id %>/edit" class="edit-btn">✎ Edit</a>
+
+                <!-- ลบโดยใช้ form + method-override เป็น fallback -->
+                <form action="/api/upload/images/<%= image._id %>?_method=DELETE" method="POST" style="display:inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this image?');">
+                  <button type="submit" class="delete-btn">🗑 Delete</button>
+                </form>
+                <% } %>
+            </div>
 
       </div>
     </div>

@@ -168,102 +168,103 @@
           <option value="private" <%=album.status==='private' ? 'selected' : '' %>>Private</option>
         </select>
 
-          <div style="margin-top:16px;">
-            <button type="submit">💾 Save</button>
-            <a href="/album/<%= album._id %>" class="cancel-link">Cancel</a>
-          </div>
-        </form>
-
-        <h3>Tags</h3>
-
-        <!-- แสดง Tag ปัจจุบัน -->
-        <div id="tagList" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
-          <% if (album.tags && album.tags.length) { %>
-            <% album.tags.forEach(tag=> { %>
-              <div class="tag-card"
-                style="background:#e3f2fd;color:#1565c0;padding:6px 12px;border-radius:20px;display:flex;align-items:center;">
-                <span>#<%= tag.title %></span>
-                <button type="button" class="remove-tag-btn" data-id="<%= tag._id || tag.id %>"
-                  style="margin-left:6px;background:#e74c3c;color:white;border:none;padding:2px 6px;border-radius:8px;cursor:pointer;">x</button>
-              </div>
-              <% }) %>
-                <% } else { %>
-                  <span style="color:#777;">No tags</span>
-                  <% } %>
+        <div style="margin-top:16px;">
+          <button type="submit">💾 Save</button>
+          <a href="/album/<%= album._id %>" class="cancel-link">Cancel</a>
         </div>
+      </form>
 
-        <!-- ฟอร์มเลือก tag จากรายการที่มีอยู่ (separate form, NOT nested) -->
-        <form id="addTagForm" class="upload-row" onsubmit="return false;">
-          <select id="selectTags" multiple style="padding:8px 12px;border-radius:8px;border:1px solid #ccc;flex:1;">
-            <% (allTags || []).forEach(tag=> { %>
-              <option value="<%= tag._id %>">
-                <%= tag.title %>
-              </option>
-              <% }) %>
-          </select>
-          <button id="addTagsBtn" type="button" style="padding:8px 16px;border-radius:8px;background:#3498db;color:white;border:none;">➕ Add</button>
-        </form>
+      <h3>Tags</h3>
 
-        <script>
-          (function(){
-            const tagListEl = document.getElementById('tagList');
-            const selectTags = document.getElementById('selectTags');
-            const addBtn = document.getElementById('addTagsBtn');
+      <!-- แสดง Tag ปัจจุบัน -->
+      <div id="tagList" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <% if (album.tags && album.tags.length) { %>
+          <% album.tags.forEach(tag=> { %>
+            <div class="tag-card"
+              style="background:#e3f2fd;color:#1565c0;padding:6px 12px;border-radius:20px;display:flex;align-items:center;">
+              <span>#<%= tag.title %></span>
+              <button type="button" class="remove-tag-btn" data-id="<%= tag._id || tag.id %>"
+                style="margin-left:6px;background:#e74c3c;color:white;border:none;padding:2px 6px;border-radius:8px;cursor:pointer;">x</button>
+            </div>
+            <% }) %>
+              <% } else { %>
+                <span style="color:#777;">No tags</span>
+                <% } %>
+      </div>
 
-            function attachRemoveHandler(btn) {
-              if (!btn) return;
-              btn.addEventListener('click', async () => {
-                const tagId = btn.dataset.id;
-                if (!confirm('คุณแน่ใจหรือไม่ว่าจะลบ tag นี้ออกจากอัลบั้ม?')) return;
-                try {
-                  const res = await fetch(`/api/albums/<%= album._id %>/tags/${tagId}`, {
-                    method: 'DELETE',
-                    credentials: 'same-origin',
-                    headers: { 'Accept': 'application/json' }
-                  });
-                  if (res.ok) {
-                    btn.closest('.tag-card')?.remove();
-                  } else {
-                    const d = await res.json().catch(()=>null);
-                    alert(d?.error || 'Remove failed');
-                  }
-                } catch(err){ console.error(err); alert('Network error'); }
-              });
-            }
+      <!-- ฟอร์มเลือก tag จากรายการที่มีอยู่ (separate form, NOT nested) -->
+      <form id="addTagForm" class="upload-row" onsubmit="return false;">
+        <select id="selectTags" multiple style="padding:8px 12px;border-radius:8px;border:1px solid #ccc;flex:1;">
+          <% (allTags || []).forEach(tag=> { %>
+            <option value="<%= tag._id %>">
+              <%= tag.title %>
+            </option>
+            <% }) %>
+        </select>
+        <button id="addTagsBtn" type="button"
+          style="padding:8px 16px;border-radius:8px;background:#3498db;color:white;border:none;">➕ Add</button>
+      </form>
 
-            // attach existing remove buttons
-            document.querySelectorAll('.remove-tag-btn').forEach(attachRemoveHandler);
+      <script>
+        (function () {
+          const tagListEl = document.getElementById('tagList');
+          const selectTags = document.getElementById('selectTags');
+          const addBtn = document.getElementById('addTagsBtn');
 
-            addBtn.addEventListener('click', async () => {
-              const selected = Array.from(selectTags.selectedOptions).map(o => o.value);
-              if (!selected.length) return alert('เลือก tag อย่างน้อย 1 รายการ');
+          function attachRemoveHandler(btn) {
+            if (!btn) return;
+            btn.addEventListener('click', async () => {
+              const tagId = btn.dataset.id;
+              if (!confirm('คุณแน่ใจหรือไม่ว่าจะลบ tag นี้ออกจากอัลบั้ม?')) return;
               try {
-                const res = await fetch(`/api/albums/<%= album._id %>/tags`, {
-                  method: 'POST',
+                const res = await fetch(`/api/albums/<%= album._id %>/tags/${tagId}`, {
+                  method: 'DELETE',
                   credentials: 'same-origin',
-                  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                  body: JSON.stringify({ tagIds: selected })
+                  headers: { 'Accept': 'application/json' }
                 });
-                const data = await res.json();
                 if (res.ok) {
-                  data.addedTags.forEach(tag => {
-                    const tagCard = document.createElement('div');
-                    tagCard.className = 'tag-card';
-                    tagCard.style.cssText = "background:#e3f2fd;color:#1565c0;padding:6px 12px;border-radius:20px;display:flex;align-items:center;margin-right:8px;";
-                    tagCard.innerHTML = `<span>#${tag.title}</span>
-                               <button type="button" class="remove-tag-btn" data-id="${tag._id}" style="margin-left:6px;background:#e74c3c;color:white;border:none;padding:2px 6px;border-radius:8px;cursor:pointer;">x</button>`;
-                    tagListEl.appendChild(tagCard);
-                    attachRemoveHandler(tagCard.querySelector('.remove-tag-btn'));
-                  });
-                  // clear selection
-                  selectTags.selectedIndex = -1;
+                  btn.closest('.tag-card')?.remove();
                 } else {
-                  alert(data.error || 'เพิ่ม tag ล้มเหลว');
+                  const d = await res.json().catch(() => null);
+                  alert(d?.error || 'Remove failed');
                 }
-              } catch(err){ console.error(err); alert('Network error'); }
+              } catch (err) { console.error(err); alert('Network error'); }
             });
-          })();
-        </script>
+          }
+
+          // attach existing remove buttons
+          document.querySelectorAll('.remove-tag-btn').forEach(attachRemoveHandler);
+
+          addBtn.addEventListener('click', async () => {
+            const selected = Array.from(selectTags.selectedOptions).map(o => o.value);
+            if (!selected.length) return alert('เลือก tag อย่างน้อย 1 รายการ');
+            try {
+              const res = await fetch(`/api/albums/<%= album._id %>/tags`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ tagIds: selected })
+              });
+              const data = await res.json();
+              if (res.ok) {
+                data.addedTags.forEach(tag => {
+                  const tagCard = document.createElement('div');
+                  tagCard.className = 'tag-card';
+                  tagCard.style.cssText = "background:#e3f2fd;color:#1565c0;padding:6px 12px;border-radius:20px;display:flex;align-items:center;margin-right:8px;";
+                  tagCard.innerHTML = `<span>#${tag.title}</span>
+                               <button type="button" class="remove-tag-btn" data-id="${tag._id}" style="margin-left:6px;background:#e74c3c;color:white;border:none;padding:2px 6px;border-radius:8px;cursor:pointer;">x</button>`;
+                  tagListEl.appendChild(tagCard);
+                  attachRemoveHandler(tagCard.querySelector('.remove-tag-btn'));
+                });
+                // clear selection
+                selectTags.selectedIndex = -1;
+              } else {
+                alert(data.error || 'เพิ่ม tag ล้มเหลว');
+              }
+            } catch (err) { console.error(err); alert('Network error'); }
+          });
+        })();
+      </script>
 
 
       <!-- upload existing image -->
@@ -287,10 +288,11 @@
       <h3>Images</h3>
       <div id="imagesGrid" class="grid">
         <% if (Array.isArray(album.images) && album.images.length) { %>
-          <% album.images.forEach(img => { %>
+          <% album.images.forEach(img=> { %>
             <div class="img-card" data-id="<%= img._id || img.id %>">
               <a href="/image/<%= img._id || img.id %>">
-                <img src="<%= img.fileId
+                <img
+                  src="<%= img.fileId
                              ? '/files/' + img.fileId
                              : (img.imageUrl || (img.filename ? '/uploads/' + img.filename : '/images/default-cover.jpg')) %>"
                   alt="<%= img.title || img.originalname || 'image' %>" />
@@ -298,19 +300,17 @@
               <p title="<%= img.title || img.originalname || '' %>">
                 <%= img.title || img.originalname || img.filename || 'image' %>
               </p>
-              <% 
-                const currentUserId = (user) ? String(user._id || user.id || '') : '';
-                const imageOwnerId = img && img.user ? String(img.user._id || img.user) : '';
-                const isOwner = currentUserId && imageOwnerId && currentUserId === imageOwnerId;
-              %>
-              <% if (isOwner) { %>
-                <button class="delete-img-btn">🗑 Delete</button>
-              <% } %>
+              <% const currentUserId=(user) ? String(user._id || user.id || '' ) : '' ; const imageOwnerId=img &&
+                img.user ? String(img.user._id || img.user) : '' ; const isOwner=currentUserId && imageOwnerId &&
+                currentUserId===imageOwnerId; %>
+                <% if (isOwner) { %>
+                  <button class="delete-img-btn">🗑 Delete</button>
+                  <% } %>
             </div>
-          <% }) %>
-        <% } else { %>
-          <p>No images in this album.</p>
-        <% } %>
+            <% }) %>
+              <% } else { %>
+                <p>No images in this album.</p>
+                <% } %>
       </div>
     </div>
 
