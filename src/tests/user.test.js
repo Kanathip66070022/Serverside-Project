@@ -4,6 +4,7 @@ import app from '../app.js';
 import UserModel from '../models/userModel.js';
 import { loginUser } from "../controllers/userController.js";
 
+// ทดสอบ registerUser controller
 describe('POST /api/users/register - simple test', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -28,6 +29,7 @@ describe('POST /api/users/register - simple test', () => {
   });
 });
 
+// ทดสอบ loginUser controller
 describe("loginUser controller", () => {
   it("should redirect to /home when login success", async () => {
     const req = {

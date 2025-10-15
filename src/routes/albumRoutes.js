@@ -32,6 +32,7 @@ const router = express.Router();
  *       200:
  *         description: รายการอัลบั้มที่ค้นได้
  */
+// Search albums
 router.get("/search", authMiddleware, searchAlbums);
 
 /**
@@ -61,6 +62,7 @@ router.get("/search", authMiddleware, searchAlbums);
  *       201:
  *         description: สร้างอัลบั้มสำเร็จ
  */
+// Create album
 router.post("/createAlbum", authMiddleware, ensureLoggedIn, createAlbum);
 
 /**
@@ -90,6 +92,7 @@ router.post("/createAlbum", authMiddleware, ensureLoggedIn, createAlbum);
  *       200:
  *         description: เพิ่มรูปสำเร็จ
  */
+// เพิ่มรูปที่มีอยู่เข้าอัลบั้ม
 router.post("/:id/images", authMiddleware, ensureLoggedIn, addImageToAlbum);
 
 /**
@@ -126,6 +129,7 @@ router.post("/:id/images", authMiddleware, ensureLoggedIn, addImageToAlbum);
  *       201:
  *         description: อัปโหลดและเพิ่มสำเร็จ
  */
+// อัปโหลดรูปใหม่แล้วเพิ่มเข้าอัลบั้ม
 router.post("/:id/images/upload", authMiddleware, ensureLoggedIn, upload.single("image"), addImageToAlbum);
 
 /**
@@ -150,6 +154,7 @@ router.post("/:id/images/upload", authMiddleware, ensureLoggedIn, upload.single(
  *       200:
  *         description: ลบสำเร็จ
  */
+// ลบรูปออกจากอัลบั้ม (และลบไฟล์/เอกสารรูป)
 router.delete("/:id/images/:imageId", authMiddleware, ensureLoggedIn, removeImageFromAlbum);
 
 /**
@@ -170,6 +175,7 @@ router.delete("/:id/images/:imageId", authMiddleware, ensureLoggedIn, removeImag
  *       200:
  *         description: ลบอัลบั้มสำเร็จ
  */
+// Delete album
 router.delete("/:id", authMiddleware, ensureLoggedIn, deleteAlbum);
 
 /**
@@ -203,6 +209,7 @@ router.delete("/:id", authMiddleware, ensureLoggedIn, deleteAlbum);
  *       200:
  *         description: อัปเดตสำเร็จ
  */
+// Update album
 router.put("/:id", authMiddleware, ensureLoggedIn, updateAlbum);
 
 /**
@@ -234,6 +241,7 @@ router.put("/:id", authMiddleware, ensureLoggedIn, updateAlbum);
  *       200:
  *         description: เพิ่มแท็กสำเร็จ
  */
+// เพิ่มแท็กให้อัลบั้ม
 router.post("/:id/tags", authMiddleware, ensureLoggedIn, addTagsToAlbum);
 
 /**
@@ -258,6 +266,7 @@ router.post("/:id/tags", authMiddleware, ensureLoggedIn, addTagsToAlbum);
  *       200:
  *         description: เอาแท็กออกสำเร็จ
  */
+// เอาแท็กออกจากอัลบั้ม
 router.delete("/:id/tags/:tagId", authMiddleware, ensureLoggedIn, removeTagFromAlbum);
 
 export default router;

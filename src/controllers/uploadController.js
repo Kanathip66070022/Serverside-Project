@@ -116,6 +116,7 @@ export const deleteImage = async (req, res) => {
   }
 };
 
+// แก้ไขข้อมูลรูปภาพ (title, content, status, เปลี่ยนไฟล์)
 export const editImage = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });

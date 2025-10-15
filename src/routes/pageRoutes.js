@@ -5,8 +5,8 @@ import { ensureLoggedIn } from "../middlewares/ensureMiddleware.js";
 
 import { showProfile, showImage } from "../controllers/pageController.js";
 import {
-  showLogin, showRegister, showUpload, showCreateAlbum,
-  showAlbum, home, editAlbumPage, editImagePage, showTags, showTagAlbums
+    showLogin, showRegister, showUpload, showCreateAlbum,
+    showAlbum, home, editAlbumPage, editImagePage, showTags, showTagAlbums
 } from "../controllers/pageController.js";
 
 const router = express.Router();
@@ -21,6 +21,7 @@ const router = express.Router();
  *       302:
  *         description: Redirect to /home
  */
+// Redirect root to /home
 router.get('/', (req, res) => res.redirect('/home'));
 
 /**
@@ -46,6 +47,7 @@ router.get('/', (req, res) => res.redirect('/home'));
  *           text/html:
  *             schema: { type: string }
  */
+// Home page
 router.get("/home", home);
 
 /**
@@ -61,6 +63,7 @@ router.get("/home", home);
  *           text/html:
  *             schema: { type: string }
  */
+// Login page
 router.get("/login", showLogin);
 
 /**
@@ -76,6 +79,7 @@ router.get("/login", showLogin);
  *           text/html:
  *             schema: { type: string }
  */
+// Register page
 router.get("/register", showRegister);
 
 /**
@@ -91,6 +95,7 @@ router.get("/register", showRegister);
  *           text/html:
  *             schema: { type: string }
  */
+// Tags page
 router.get("/tags", showTags);
 
 /**
@@ -113,6 +118,7 @@ router.get("/tags", showTags);
  *       404:
  *         description: Not found
  */
+// Albums by tag
 router.get("/tags/:id", showTagAlbums);
 
 /**
@@ -133,6 +139,7 @@ router.get("/tags/:id", showTagAlbums);
  *       401:
  *         description: Unauthorized
  */
+// Profile page
 router.get("/profile", authMiddleware, ensureLoggedIn, showProfile);
 
 /**
@@ -153,6 +160,7 @@ router.get("/profile", authMiddleware, ensureLoggedIn, showProfile);
  *       401:
  *         description: Unauthorized
  */
+// Upload page
 router.get("/upload", authMiddleware, ensureLoggedIn, showUpload);
 
 /**
@@ -180,6 +188,7 @@ router.get("/upload", authMiddleware, ensureLoggedIn, showUpload);
  *       404:
  *         description: Not found
  */
+// Image detail page
 router.get("/image/:id", authMiddleware, ensureLoggedIn, showImage);
 
 /**
@@ -207,6 +216,7 @@ router.get("/image/:id", authMiddleware, ensureLoggedIn, showImage);
  *       404:
  *         description: Not found
  */
+// Edit image page
 router.get("/image/:id/edit", authMiddleware, ensureLoggedIn, editImagePage);
 
 /**
@@ -227,6 +237,7 @@ router.get("/image/:id/edit", authMiddleware, ensureLoggedIn, editImagePage);
  *       401:
  *         description: Unauthorized
  */
+// Create album page
 router.get("/album/create", authMiddleware, ensureLoggedIn, showCreateAlbum);
 
 /**
@@ -254,6 +265,7 @@ router.get("/album/create", authMiddleware, ensureLoggedIn, showCreateAlbum);
  *       404:
  *         description: Not found
  */
+// Album detail page
 router.get("/album/:id", authMiddleware, ensureLoggedIn, showAlbum);
 
 /**
@@ -281,6 +293,7 @@ router.get("/album/:id", authMiddleware, ensureLoggedIn, showAlbum);
  *       404:
  *         description: Not found
  */
+// Edit album page
 router.get("/album/:id/edit", authMiddleware, ensureLoggedIn, editAlbumPage);
 
 export default router;

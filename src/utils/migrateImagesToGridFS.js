@@ -3,6 +3,7 @@ import path from "path";
 import mongoose from "mongoose";
 import Image from "../models/imageModel.js";
 
+// ฟังก์ชันย้ายรูปจากดิสก์ไป GridFS
 export async function migrateDiskImagesToGridFS() {
   // รองรับหลายโฟลเดอร์
   const dirs = [

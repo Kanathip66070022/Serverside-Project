@@ -2,6 +2,7 @@
 import { jest } from "@jest/globals";
 import { listTags, getTagCount } from "../controllers/tagController.js";
 
+// ทดสอบ listTags controller
 describe("listTags controller", () => {
     it("should return tags successfully", async () => {
         const req = {};
@@ -24,6 +25,7 @@ describe("listTags controller", () => {
     });
 });
 
+// ทดสอบ getTagCount controller
 describe("getTagCount controller", () => {
     it("should return tag count in json", async () => {
         const req = {};

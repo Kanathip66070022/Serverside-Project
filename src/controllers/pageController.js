@@ -75,7 +75,8 @@ export const home = async (req, res) => {
     return res.render("home", {
       albums, myAlbums, user: req.user,
       currentPage: safePage, totalPages, sort,
-      perPage: limit
+      perPage: limit,
+      isSearch: false
     });
   } catch (err) {
     console.error("home error:", err);
@@ -256,6 +257,7 @@ export const showAlbum = async (req, res) => {
   }
 };
 
+// ฟังก์ชันแสดงหน้าแก้ไขอัลบั้ม
 export const editAlbumPage = async (req, res) => {
   try {
     const Album = (await import("../models/albumModel.js")).default;
@@ -316,6 +318,7 @@ export const editAlbumPage = async (req, res) => {
   }
 };
 
+// ฟังก์ชันแก้ไขโปรไฟล์ (PUT /api/users/profile)
 export const editImagePage = async (req, res) => {
   try {
     const Image = (await import("../models/imageModel.js")).default;
@@ -337,6 +340,7 @@ export const editImagePage = async (req, res) => {
   }
 };
 
+// ฟังก์ชันแสดงหน้ารายการแท็ก
 export const showTags = async (req, res) => {
   try {
     const Tag = (await import("../models/tagModel.js")).default;

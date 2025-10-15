@@ -1,5 +1,6 @@
 import Tag from "../models/tagModel.js";
 
+// ดึงรายการแท็กทั้งหมด
 export const listTags = async (req, res) => {
   try {
     const tags = await Tag.find().sort({ title: 1 }).lean();
@@ -10,6 +11,7 @@ export const listTags = async (req, res) => {
   }
 };
 
+// ดึงจำนวนแท็กทั้งหมด (สำหรับสถิติ)
 export const getTagCount = async (req, res) => {
   try {
     const count = await Tag.countTags();
@@ -20,6 +22,7 @@ export const getTagCount = async (req, res) => {
   }
 };
 
+// สร้างแท็กใหม่ (ถ้ามีอยู่แล้วจะไม่สร้างซ้ำ) และเปลี่ยนเส้นทางไปที่ /tags
 export const createTag = async (req, res) => {
   try {
     const title = (req.body.title || "").trim();
@@ -37,6 +40,7 @@ export const createTag = async (req, res) => {
   }
 };
 
+// ลบแท็กตาม ID
 export const deleteTag = async (req, res) => {
   try {
     const id = req.params.id;

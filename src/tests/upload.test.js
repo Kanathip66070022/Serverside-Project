@@ -1,6 +1,7 @@
 import { jest } from "@jest/globals";
 import { uploadImage } from "../controllers/uploadController.js"; // ปรับ path ให้ตรงจริง
 
+// ทดสอบ uploadImage controller
 describe("uploadImage controller", () => {
     it("should return 400 if no file uploaded", async () => {
         const req = {
