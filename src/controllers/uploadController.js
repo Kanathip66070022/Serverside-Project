@@ -1,62 +1,58 @@
 import fs from "fs";
 import path from "path";
+import mongoose from "mongoose";
 
 import Image from "../models/imageModel.js";
 
-// ฟังก์ชันอัพโหลดรูป (รวม logic ทั้งหมดไว้ที่เดียว)
+// ฟังก์ชันอัพโหลดรูป (GridFS)
 export const uploadImage = async (req, res) => {
-    try {
-        // ตรวจล็อกอิน
-        if (!req.user) {
-            return res.status(401).redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
-        }
-
-        // ตรวจไฟล์และฟิลด์
-        if (!req.file) {
-            return res.status(400).render("upload", { error: "No file uploaded", success: null });
-        }
-
-        const { title, content, status, tags } = req.body;
-        if (!title || !title.trim()) {
-            return res.status(400).render("upload", { error: "Title is required", success: null });
-        }
-
-        // ensure uploads dir
-        const uploadsDir = path.resolve("uploads");
-        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-        const imageUrl = `/uploads/${req.file.filename}`;
-
-        const imageData = {
-            user: req.user._id,
-            title: title.trim(),
-            content: content || "",
-            imageUrl,
-            filename: req.file.filename,
-            originalname: req.file.originalname,
-            mimetype: req.file.mimetype,
-            size: req.file.size,
-            status: status || "public",
-            tags: tags ? (Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim()).filter(Boolean)) : []
-        };
-
-        await Image.create(imageData);
-
-        return res.status(201).render("upload", {
-            error: null,
-            success: "Upload successful",
-            file: {
-                originalname: req.file.originalname,
-                filename: req.file.filename,
-                mimetype: req.file.mimetype,
-                size: req.file.size,
-                imageUrl
-            }
-        });
-    } catch (err) {
-        console.error("uploadImage error:", err);
-        return res.status(500).render("upload", { error: err.message || "Upload failed", success: null });
+  try {
+    if (!req.file) {
+      return res.status(400).render("upload", { error: "กรุณาเลือกไฟล์!", success: null, file: null });
     }
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: "uploads" });
+    const uploadStream = bucket.openUploadStream(req.file.originalname, {
+      contentType: req.file.mimetype,
+      metadata: {
+        uploadedBy: req.user ? String(req.user._id) : null,
+        originalname: req.file.originalname
+      }
+    });
+
+    uploadStream.end(req.file.buffer);
+
+    uploadStream.on("finish", async () => {
+      try {
+        const doc = await Image.create({
+          title: req.body.title || req.file.originalname || "Untitled",
+          content: req.body.content || "",
+          fileId: uploadStream.id,
+          filename: uploadStream.filename || req.file.originalname,
+          contentType: req.file.mimetype,
+          status: req.body.status || "public",
+          user: req.user?._id
+        });
+
+        return res.status(200).render("upload", {
+          error: null,
+          success: "อัปโหลดสำเร็จ!",
+          file: { imageUrl: `/files/${doc.fileId}`, originalname: doc.filename }
+        });
+      } catch (e) {
+        console.error("save image doc error:", e);
+        return res.status(500).render("upload", { error: "เกิดข้อผิดพลาด!", success: null, file: null });
+      }
+    });
+
+    uploadStream.on("error", (err) => {
+      console.error("GridFS upload error:", err);
+      return res.status(500).render("upload", { error: "อัปโหลดล้มเหลว!", success: null, file: null });
+    });
+  } catch (err) {
+    console.error("uploadImage error:", err);
+    return res.status(500).render("upload", { error: "เกิดข้อผิดพลาดในระบบ!", success: null, file: null });
+  }
 };
 
 // ฟังก์ชันดึงรูปทั้งหมด (รวม populate user)

@@ -1,28 +1,29 @@
 import mongoose from "mongoose";
 
 const imageSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String
-    },
-    imageUrl: {
-        type: String,
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    // เชื่อมกับ user
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    }
+  title: { 
+    type: String, 
+    required: true },
+  content: { 
+    type: String, 
+    default: "" },
+  fileId: { 
+    type: mongoose.Schema.Types.ObjectId, required: true }, // GridFS _id
+  filename: { 
+    type: String 
+  },
+  contentType: { 
+    type: String 
+  },
+  status: { 
+    type: String, enum: ["public", "private"], default: "public" 
+  },
+  user: { 
+    type: mongoose.Schema.Types.ObjectId, ref: "User", required: true 
+  },
+  createdAt: { 
+    type: Date, default: Date.now 
+  }
 });
 
-const Image = mongoose.model("Image", imageSchema);
-export default Image;
+export default mongoose.models.Image || mongoose.model("Image", imageSchema);

@@ -7,12 +7,12 @@
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f6fa;
       color: #333;
     }
 
     .container {
+      font-family: Arial, sans-serif;
       max-width: 900px;
       margin: 40px auto;
       padding: 20px;
@@ -147,8 +147,11 @@
 </head>
 
 <body>
+
   <%- include('partials/header') %>
+
     <div class="container">
+
       <h1>Edit Album</h1>
 
       <!-- album meta edit -->
@@ -185,7 +188,7 @@
               </div>
               <% }) %>
                 <% } else { %>
-                  <span style="color:#777;">ยังไม่มีแท็ก</span>
+                  <span style="color:#777;">No tags</span>
                   <% } %>
         </div>
 
@@ -284,27 +287,30 @@
       <h3>Images</h3>
       <div id="imagesGrid" class="grid">
         <% if (Array.isArray(album.images) && album.images.length) { %>
-          <% album.images.forEach(img=> { %>
+          <% album.images.forEach(img => { %>
             <div class="img-card" data-id="<%= img._id || img.id %>">
               <a href="/image/<%= img._id || img.id %>">
-                <img src="<%= img.imageUrl || ('/uploads/' + img.filename) %>"
+                <img src="<%= img.fileId
+                             ? '/files/' + img.fileId
+                             : (img.imageUrl || (img.filename ? '/uploads/' + img.filename : '/images/default-cover.jpg')) %>"
                   alt="<%= img.title || img.originalname || 'image' %>" />
               </a>
               <p title="<%= img.title || img.originalname || '' %>">
                 <%= img.title || img.originalname || img.filename || 'image' %>
               </p>
-
-              <% const currentUserId=(typeof user !=='undefined' && user) ? String(user._id || user.id || '' ) : '' ;
-                const imageOwnerId=img && img.user ? String(img.user._id || img.user) : '' ; const isOwner=currentUserId
-                && imageOwnerId && currentUserId===imageOwnerId; %>
-                <% if (isOwner) { %>
-                  <button class="delete-img-btn">🗑 Delete</button>
-                  <% } %>
+              <% 
+                const currentUserId = (user) ? String(user._id || user.id || '') : '';
+                const imageOwnerId = img && img.user ? String(img.user._id || img.user) : '';
+                const isOwner = currentUserId && imageOwnerId && currentUserId === imageOwnerId;
+              %>
+              <% if (isOwner) { %>
+                <button class="delete-img-btn">🗑 Delete</button>
+              <% } %>
             </div>
-            <% }) %>
-              <% } else { %>
-                <p>No images in this album.</p>
-                <% } %>
+          <% }) %>
+        <% } else { %>
+          <p>No images in this album.</p>
+        <% } %>
       </div>
     </div>
 

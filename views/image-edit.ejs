@@ -117,7 +117,16 @@
     <form action="/api/upload/images/<%= image._id %>?_method=PATCH" method="POST" enctype="multipart/form-data">
       <label>Preview</label>
       <div class="row">
-        <img class="thumb" src="<%= image.imageUrl || ('/uploads/' + image.filename) %>" alt="thumb">
+        <img class="thumb"
+             src="<%= image.fileId
+                    ? ('/files/' + image.fileId)
+                    : (image.imageUrl
+                        ? image.imageUrl
+                        : (image.filename
+                            ? '/uploads/' + encodeURIComponent(image.filename)
+                            : '/images/default-cover.jpg')) %>"
+             alt="thumb"
+             onerror="this.src='/images/default-cover.jpg'">
       </div>
 
       <label>Title</label>

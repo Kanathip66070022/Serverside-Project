@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการ Tags</title>
+    <title>Tags</title>
     <style>
         :root {
             --bg: #f6f7fb;
@@ -128,24 +128,24 @@
 
         <div class="body">
 
-            <h1>รายการ Tags</h1>
+            <h1>Tags</h1>
 
             <!-- ฟอร์มเพิ่ม Tag -->
             <form id="createTagForm" action="/api/tags" method="POST" class="add-form">
-                <label for="title">ชื่อ Tag</label>
+                <label for="title">Tag name</label>
                 <input type="text" name="title" id="title" placeholder="Tag title" required>
                 <button type="submit">Create Tag</button>
             </form>
 
             <!-- ช่องค้นหา -->
             <div class="search">
-                <input type="text" id="searchInput" placeholder="ค้นหา tag...">
+                <input type="text" id="searchInput" placeholder="Search tags...">
             </div>
 
             <!-- รายการ Tags -->
             <div class="tags-list" id="tagsList">
                 <% if (!tags || tags.length===0) { %>
-                    <div class="no-tags">ยังไม่มี tag</div>
+                    <div class="no-tags">No tags available.</div>
                     <% } else { %>
                         <% tags.forEach(tag=> { %>
                             <div class="tag-card" data-title="<%= tag.title.toLowerCase() %>">
