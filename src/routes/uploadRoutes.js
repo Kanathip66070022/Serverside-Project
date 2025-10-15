@@ -1,6 +1,6 @@
 import express from "express";
 
-import upload from "../config/multer.js";
+import upload from "../config/multerConfig.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { ensureLoggedIn } from "../middlewares/ensureMiddleware.js";
@@ -18,5 +18,8 @@ router.patch("/images/:id", authMiddleware, ensureLoggedIn, upload.single("image
 
 // optional alias singular
 router.patch("/image/:id", authMiddleware, ensureLoggedIn, upload.single("image"), editImage);
+
+// protected upload route with auth
+router.post("/upload", authMiddleware, ensureLoggedIn, upload.single("image"), uploadImage);
 
 export default router;

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Home - Public Albums</title>
+    <title>Tag - <%= (tag && tag.title) ? tag.title : 'Tag' %></title>
     <style>
         body {
             margin: 0;
@@ -130,11 +130,11 @@
                                 <%= album.title %>
                             </h3>
                             <p class="album-content">
-                                <%= album.content || "ไม่มีรายละเอียด" %>
+                                <%= album.content || "No details" %>
                             </p>
                             <div class="album-footer">
                                 <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
-                                <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
+                                <a href="/album/<%= album._id || album.id %>">View Album →</a>
                             </div>
                         </div>
                     </div>

@@ -151,9 +151,15 @@
                     <div class="album-card">
                         <div class="album-cover">
                             <a href="/album/<%= album._id || album.id %>">
-                                <img src="<%= album.cover
-                                || (album.images && album.images[0] && (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename)))
-                                || '/images/default-cover.jpg' %>" alt="<%= album.title %>">
+                                <% 
+                                  const pubImg0 = album.images && album.images[0];
+                                  const pubCover = album.cover
+                                    || (pubImg0 && (pubImg0.fileId
+                                          ? ('/files/' + pubImg0.fileId)
+                                          : (pubImg0.imageUrl || ('/uploads/' + pubImg0.filename))))
+                                    || '/images/default-cover.jpg';
+                                %>
+                                <img src="<%= pubCover %>" alt="<%= album.title %>">
                             </a>
                         </div>
                         <div class="album-info">
@@ -161,11 +167,11 @@
                                 <%= album.title %>
                             </h3>
                             <p class="album-content">
-                                <%= album.content || "ไม่มีรายละเอียด" %>
+                                <%= album.content || "No details" %>
                             </p>
                             <div class="album-footer">
                                 <span>👤 <%= album.owner || (album.user && album.user.username) || 'Unknown' %></span>
-                                <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
+                                <a href="/album/<%= album._id || album.id %>">View Album →</a>
                             </div>
                         </div>
                     </div>
@@ -198,9 +204,15 @@
                         <div class="album-card">
                             <div class="album-cover">
                                 <a href="/album/<%= album._id || album.id %>">
-                                    <img src="<%= album.cover
-                            || (album.images && album.images[0] && (album.images[0].imageUrl || ('/uploads/' + album.images[0].filename)))
-                            || '/images/default-cover.jpg' %>" alt="<%= album.title %>">
+                                    <%
+                                      const myImg0 = album.images && album.images[0];
+                                      const myCover = album.cover
+                                        || (myImg0 && (myImg0.fileId
+                                              ? ('/files/' + myImg0.fileId)
+                                              : (myImg0.imageUrl || ('/uploads/' + myImg0.filename))))
+                                        || '/images/default-cover.jpg';
+                                    %>
+                                    <img src="<%= myCover %>" alt="<%= album.title %>">
                                 </a>
                             </div>
                             <div class="album-info">
@@ -208,11 +220,11 @@
                                     <%= album.title %>
                                 </h3>
                                 <p class="album-content">
-                                    <%= album.content || "ไม่มีรายละเอียด" %>
+                                    <%= album.content || "No details" %>
                                 </p>
                                 <div class="album-footer">
                                     <span>📅 <%= new Date(album.createdAt).toLocaleDateString() %></span>
-                                    <a href="/album/<%= album._id || album.id %>">ดูอัลบั้ม →</a>
+                                    <a href="/album/<%= album._id || album.id %>">View Album →</a>
                                 </div>
                             </div>
                         </div>
@@ -220,7 +232,7 @@
 
                 </div>
                 <% } else if (user) { %>
-                    <p style="text-align:center; color:#888; margin-top:50px;">คุณยังไม่มีอัลบั้มของตัวเอง 😅</p>
+                    <p style="text-align:center; color:#888; margin-top:50px;">You don't have your own album yet. 😅</p>
                     <% } %>
 
         </div>
