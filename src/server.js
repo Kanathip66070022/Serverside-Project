@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 connectDB()
   .then(() => {
     // Start the server only after a successful database connection
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`✅ Server running on http://localhost:${PORT}`);
     });
 
