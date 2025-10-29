@@ -5,8 +5,12 @@ import { S3Client } from "@aws-sdk/client-s3";
 import path from "path";
 
 const s3 = new S3Client({
-  region: process.env.S3_REGION || process.env.AWS_REGION,
-  // ปล่อยให้ AWS SDK ดึงคีย์จาก ENV เอง (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN)
+  region: process.env.S3_REGION || process.env.AWS_REGION || "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    sessionToken: process.env.AWS_SESSION_TOKEN, // ถ้าใช้ชั่วคราว
+  },
 });
 
 function safeName(originalname) {
@@ -20,21 +24,18 @@ function safeName(originalname) {
 }
 
 const bucket = process.env.S3_BUCKET || process.env.AWS_BUCKET_NAME;
-if (!bucket) {
-  throw new Error("S3_BUCKET (or AWS_BUCKET_NAME) is not set in .env");
-}
+if (!bucket) throw new Error("S3_BUCKET (or AWS_BUCKET_NAME) is not set");
 
 const storage = multerS3({
   s3,
   bucket,
   contentType: multerS3.AUTO_CONTENT_TYPE,
+  // บางองค์กร/บัคเก็ตบังคับ SSE:
+  serverSideEncryption: process.env.S3_SSE || "AES256", // เปลี่ยนเป็น "aws:kms" ถ้าบังคับ KMS
+  sseKmsKeyId: process.env.S3_KMS_KEY_ID,               // ใส่เมื่อใช้ aws:kms
+  // อย่าตั้ง ACL ถ้าเปิด Block Public Access
   metadata: (req, file, cb) => cb(null, { fieldName: file.fieldname }),
   key: (req, file, cb) => cb(null, `uploads/${safeName(file.originalname)}`),
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-});
-
-export default upload;
+export default multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
