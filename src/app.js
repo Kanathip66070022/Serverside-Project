@@ -56,12 +56,18 @@ app.get("/api-status", (req, res) => {
   res.send("Cloud Post-IT API is running 🚀");
 });
 
-// Health Check Route
+
+// Health check
 app.get("/health", (req, res) => {
   res.status(200).send("ok");
 });
 
+// Root health check
+app.get("/", (req, res) => {
+  res.status(200).send("ok");
+});
 
+// Swagger API Documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 export default app;
