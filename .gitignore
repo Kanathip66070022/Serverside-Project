@@ -9,3 +9,6 @@ uploads/*
 
 # But keep the folder itself
 !uploads/.gitkeep
+
+# SSL keys
+node-key.pem
