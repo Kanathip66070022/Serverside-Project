@@ -2,7 +2,7 @@
 node_modules/
 
 # environment variables
-# .env
+.env
 
 # uploaded files
 uploads/*
@@ -13,4 +13,4 @@ uploads/*
 # SSL keys
 node-key.pem
 
-.env.env
+.env
