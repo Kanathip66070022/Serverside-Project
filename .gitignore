@@ -13,4 +13,4 @@ uploads/*
 # SSL keys
 node-key.pem
 
-.env
+.env.env
