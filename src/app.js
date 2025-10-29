@@ -62,7 +62,7 @@ app.get("/health", (req, res) => {
   res.status(200).send("ok");
 });
 
-// Root health checkk
+// Root health check
 app.get("/", (req, res) => {
   res.status(200).send("ok");
 });
