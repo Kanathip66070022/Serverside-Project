@@ -1,4 +1,7 @@
 // controllers/postController.js
+import fs from "fs";
+import path from "path";
+
 export const createAlbum = async (req, res) => {
   try {
     const Album = (await import("../models/albumModel.js")).default;

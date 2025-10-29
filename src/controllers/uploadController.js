@@ -1,57 +1,63 @@
 import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 import Image from "../models/imageModel.js";
 
-// ฟังก์ชันอัพโหลดรูป (GridFS)
+const s3 = new S3Client({ region: process.env.S3_REGION || process.env.AWS_REGION });
+function buildPublicUrlFromKey(key) {
+  const base =
+    process.env.S3_PUBLIC_URL_BASE ||
+    `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION || process.env.AWS_REGION}.amazonaws.com`;
+  return key ? `${base}/${key}` : null;
+}
+
 export const uploadImage = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).render("upload", { error: "กรุณาเลือกไฟล์!", success: null, file: null });
+    const { title = "", content = "", tags, albumId } = req.body;
+    const f = req.file; // จาก multer-s3
+
+    // ดึงค่า S3 จาก req.file
+    let imageUrl = f?.location || null;   // URL สาธารณะ
+    const filename = f?.key || null;      // S3 object key
+    const fileId = null;                  // ไม่ใช้ GridFS แล้ว
+
+    // ถ้าไม่มี location ให้สร้าง URL เอง (เช่นใช้ CloudFront)
+    if (!imageUrl && filename) {
+      const base =
+        process.env.S3_PUBLIC_URL_BASE ||
+        `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com`;
+      imageUrl = `${base}/${filename}`;
     }
 
-    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: "uploads" });
-    const uploadStream = bucket.openUploadStream(req.file.originalname, {
-      contentType: req.file.mimetype,
-      metadata: {
-        uploadedBy: req.user ? String(req.user._id) : null,
-        originalname: req.file.originalname
-      }
+    const doc = await Image.create({
+      title,
+      content,
+      imageUrl,
+      filename,     // เก็บ key ไว้เพื่อลบ/แก้ไขภายหลัง
+      fileId,       // คงเป็น null
+      user: req.user?._id || null,
+      tags: Array.isArray(tags) ? tags : (tags ? [tags] : [])
     });
 
-    uploadStream.end(req.file.buffer);
+    // แนบกับอัลบั้มถ้ามี
+    if (albumId) {
+      const Album = (await import("../models/albumModel.js")).default;
+      await Album.findByIdAndUpdate(albumId, { $addToSet: { images: doc._id } });
+    }
 
-    uploadStream.on("finish", async () => {
-      try {
-        const doc = await Image.create({
-          title: req.body.title || req.file.originalname || "Untitled",
-          content: req.body.content || "",
-          fileId: uploadStream.id,
-          filename: uploadStream.filename || req.file.originalname,
-          contentType: req.file.mimetype,
-          status: req.body.status || "public",
-          user: req.user?._id
-        });
-
-        return res.status(200).render("upload", {
-          error: null,
-          success: "อัปโหลดสำเร็จ!",
-          file: { imageUrl: `/files/${doc.fileId}`, originalname: doc.filename }
-        });
-      } catch (e) {
-        console.error("save image doc error:", e);
-        return res.status(500).render("upload", { error: "เกิดข้อผิดพลาด!", success: null, file: null });
-      }
-    });
-
-    uploadStream.on("error", (err) => {
-      console.error("GridFS upload error:", err);
-      return res.status(500).render("upload", { error: "อัปโหลดล้มเหลว!", success: null, file: null });
-    });
+    // ตอบกลับ
+    if (req.headers.accept?.includes("application/json")) {
+      return res.status(201).json(doc);
+    }
+    return res.redirect(`/image/${doc._id}`);
   } catch (err) {
     console.error("uploadImage error:", err);
-    return res.status(500).render("upload", { error: "เกิดข้อผิดพลาดในระบบ!", success: null, file: null });
+    if (req.headers.accept?.includes("application/json")) {
+      return res.status(500).json({ error: "Upload failed" });
+    }
+    return res.status(500).render("upload", { error: "Upload failed" });
   }
 };
 
@@ -127,27 +133,37 @@ export const editImage = async (req, res) => {
     const image = await Image.findById(id);
     if (!image) return res.status(404).json({ error: "Image not found" });
 
-    // ownership check
     if (String(image.user) !== String(req.user._id)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    // update metadata
+    // metadata
     if (typeof req.body.title !== "undefined") image.title = String(req.body.title).trim() || image.title;
     if (typeof req.body.content !== "undefined") image.content = String(req.body.content).trim();
     if (typeof req.body.status !== "undefined") image.status = String(req.body.status);
 
     // replace file if uploaded
     if (req.file) {
-      // remove old file
-      if (image.filename) {
+      // ลบไฟล์เก่า (S3 ถ้ามีบัคเก็ต, ไม่งั้นลบไฟล์โลคัล)
+      if (image.filename && process.env.S3_BUCKET) {
+        try {
+          await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: image.filename }));
+        } catch (_) {}
+      } else if (image.filename) {
         const oldPath = path.join(process.cwd(), "uploads", image.filename);
         await fs.promises.unlink(oldPath).catch(() => null);
       }
-      // update image doc
-      image.filename = req.file.filename;
-      image.originalname = req.file.originalname;
-      image.imageUrl = `/uploads/${req.file.filename}`;
+
+      // map จาก multer-s3
+      const f = req.file;
+      const key = f.key || f.filename;              // key สำหรับ S3, เผื่อกรณีใช้ disk
+      const url = f.location || buildPublicUrlFromKey(key);
+
+      image.filename = key || image.filename;       // เก็บ key ไว้สำหรับลบ/แก้ไข
+      image.imageUrl = url || image.imageUrl;       // URL สาธารณะ
+      image.fileId = null;                          // ไม่ใช้ GridFS แล้ว
+      image.originalname = f.originalname || image.originalname;
+      image.contentType = f.mimetype || image.contentType;
     }
 
     await image.save();
@@ -156,7 +172,6 @@ export const editImage = async (req, res) => {
       const fresh = await Image.findById(id).lean();
       return res.status(200).json({ ok: true, image: fresh });
     }
-    // fallback redirect to image page
     return res.redirect(`/image/${id}`);
   } catch (err) {
     console.error("editImage error:", err);

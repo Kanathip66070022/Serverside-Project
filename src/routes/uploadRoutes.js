@@ -1,6 +1,6 @@
 import express from "express";
 
-import upload from "../config/multerConfig.js";
+import upload from "../config/multerS3.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { ensureLoggedIn } from "../middlewares/ensureMiddleware.js";
